@@ -2,6 +2,9 @@ module.exports = {
     // Default port
     port: 1337,
 
+    // The middlewares
+    middlewares: [],
+
     // Command line interface
     // Used by the bundle solfege.bundle.cli
     cli: {

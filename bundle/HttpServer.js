@@ -11,9 +11,6 @@ var HttpServer = solfege.util.Class.create(function()
     // Set the default configuration
     this.configuration = require('../configuration/default.js');
 
-    // Initialize the middleware list
-    this.middlewares = [defaultMiddleware];
-
     // By default, the server is not started
     this.isStarted = false;
 
@@ -35,14 +32,6 @@ proto.application;
  * @api private
  */
 proto.configuration;
-
-/**
- * The middlewares
- *
- * @type {Array}
- * @api private
- */
-proto.middlewares;
 
 /**
  * Indicates that the server is started
@@ -119,16 +108,23 @@ proto.start = function*()
  */
 proto.createMiddlewareDecorator = function()
 {
-    var self = this;
     var emptyMiddleware = function*(){};
+    var self = this;
 
+    // Build the middleware list
+    // Include a default middleware in order to always display something
+    var middlewares = [defaultMiddleware].concat(this.configuration.middlewares);
+
+    // Build the top decorator
     return function*(next)
     {
-        var index = self.middlewares.length;
+        // Start to the end of the list
+        // The previous middleware is the argument of the current one, etc.
+        var index = middlewares.length;
         var previousMiddleware = next || emptyMiddleware();
 
         while (index--) {
-            var currentMiddleware = self.middlewares[index];
+            var currentMiddleware = middlewares[index];
             previousMiddleware = currentMiddleware.call(this, previousMiddleware);
         }
 
