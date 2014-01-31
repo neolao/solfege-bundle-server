@@ -1,4 +1,4 @@
-var solfege = require('solfeges');
+var solfege = require('solfegejs');
 var http = require('http');
 
 /**
