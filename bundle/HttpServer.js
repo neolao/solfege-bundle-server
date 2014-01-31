@@ -1,5 +1,7 @@
 var solfege = require('solfegejs');
 var http = require('http');
+var co = require('co');
+var defaultMiddleware = require('./middleware/default');
 
 /**
  * A simple HTTP server
@@ -8,6 +10,9 @@ var HttpServer = solfege.util.Class.create(function()
 {
     // Set the default configuration
     this.configuration = require('../configuration/default.js');
+
+    // Initialize the middleware list
+    this.middlewares = [defaultMiddleware];
 
     // By default, the server is not started
     this.isStarted = false;
@@ -30,6 +35,14 @@ proto.application;
  * @api private
  */
 proto.configuration;
+
+/**
+ * The middlewares
+ *
+ * @type {Array}
+ * @api private
+ */
+proto.middlewares;
 
 /**
  * Indicates that the server is started
@@ -80,13 +93,18 @@ proto.overrideConfiguration = function*(customConfiguration)
  */
 proto.start = function*()
 {
+    var self = this;
     var port = this.configuration.port;
+
+    // Build the main listener
+    var decorator = this.createMiddlewareDecorator();
+    var listener = co(decorator);
 
     // Create the server
     var server = http.createServer(function(request, response)
     {
-        console.log('request: ', request.url);
-        response.end('ok');
+        var context = self.createContext(request, response);
+        listener.call(context);
     });
 
     this.isStarted = true;
@@ -95,12 +113,52 @@ proto.start = function*()
 };
 
 /**
+ * Create the middleware decorator with the middleware list
+ *
+ * @return  {GeneratorFunction}     The middleware decorator
+ */
+proto.createMiddlewareDecorator = function()
+{
+    var self = this;
+    var emptyMiddleware = function*(){};
+
+    return function*(next)
+    {
+        var index = self.middlewares.length;
+        var previousMiddleware = next || emptyMiddleware();
+
+        while (index--) {
+            var currentMiddleware = self.middlewares[index];
+            previousMiddleware = currentMiddleware.call(this, previousMiddleware);
+        }
+
+        yield *previousMiddleware;
+    };
+};
+
+/**
+ * Create a context based on the request and the response
+ *
+ * @param   {Object}    request     The nodejs request
+ * @param   {Object}    response    The nodejs response
+ */
+proto.createContext = function(request, response)
+{
+    var context = {};
+
+    context.request = request;
+    context.response = response;
+
+    return context;
+};
+
+/**
  * Executed when the application ends
  */
 proto.onApplicationEnd = function*()
 {
     if (this.isStarted) {
-        console.log('SolfegeJS HTTP server stopped');
+        console.log('\nSolfegeJS HTTP server stopped');
     }
 };
 
