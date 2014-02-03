@@ -8,13 +8,18 @@ var defaultMiddleware = require('./middleware/default');
  */
 var HttpServer = solfege.util.Class.create(function()
 {
+    // Call parent constructor
+    solfege.kernel.EventEmitter.call(this);
+
+
+
     // Set the default configuration
     this.configuration = require('../configuration/default.js');
 
     // By default, the server is not started
     this.isStarted = false;
 
-}, 'solfege.bundle.server.HttpServer');
+}, 'solfege.bundle.server.HttpServer', solfege.kernel.EventEmitter);
 var proto = HttpServer.prototype;
 
 /**
@@ -92,8 +97,7 @@ proto.start = function*()
     // Create the server
     var server = http.createServer(function(request, response)
     {
-        var context = self.createContext(request, response);
-        listener.call(context);
+        listener(request, response);
     });
 
     this.isStarted = true;
@@ -109,14 +113,23 @@ proto.start = function*()
 proto.createMiddlewareDecorator = function()
 {
     var emptyMiddleware = function*(){};
+    var bindGenerator = solfege.util.Function.bindGenerator;
     var self = this;
 
-    // Build the middleware list
+    // Build the middleware list from the configuration
     // Include a default middleware in order to always display something
-    var middlewares = [defaultMiddleware].concat(this.configuration.middlewares);
+    var middlewares = [bindGenerator(this, defaultMiddleware)];
+    var total = this.configuration.middlewares.length;
+    for (var index = 0; index < total; ++index) {
+        var bundleId = this.configuration.middlewares[index];
+        var bundle = this.application.getBundle(bundleId);
+        if (bundle && 'function' === typeof bundle.middleware && 'GeneratorFunction' === bundle.middleware.constructor.name) {
+            middlewares = middlewares.concat(bindGenerator(bundle, bundle.middleware));
+        }
+    }
 
     // Build the top decorator
-    return function*(next)
+    return function*(request, response, next)
     {
         // Start to the end of the list
         // The previous middleware is the argument of the current one, etc.
@@ -125,7 +138,7 @@ proto.createMiddlewareDecorator = function()
 
         while (index--) {
             var currentMiddleware = middlewares[index];
-            previousMiddleware = currentMiddleware.call(this, previousMiddleware);
+            previousMiddleware = currentMiddleware(request, response, previousMiddleware);
         }
 
         yield *previousMiddleware;
