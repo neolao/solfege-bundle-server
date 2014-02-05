@@ -11,8 +11,6 @@ var HttpServer = solfege.util.Class.create(function()
     // Call parent constructor
     solfege.kernel.EventEmitter.call(this);
 
-
-
     // Set the default configuration
     this.configuration = require('../configuration/default.js');
 
@@ -143,22 +141,6 @@ proto.createMiddlewareDecorator = function()
 
         yield *previousMiddleware;
     };
-};
-
-/**
- * Create a context based on the request and the response
- *
- * @param   {Object}    request     The nodejs request
- * @param   {Object}    response    The nodejs response
- */
-proto.createContext = function(request, response)
-{
-    var context = {};
-
-    context.request = request;
-    context.response = response;
-
-    return context;
 };
 
 /**
