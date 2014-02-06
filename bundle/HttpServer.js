@@ -1,7 +1,8 @@
 var solfege = require('solfegejs');
+var Request = require('./Request');
+var Response = require('./Response');
 var http = require('http');
 var co = require('co');
-var defaultMiddleware = require('./middleware/default');
 
 /**
  * A simple HTTP server
@@ -95,7 +96,10 @@ proto.start = function*()
     // Create the server
     var server = http.createServer(function(request, response)
     {
-        listener(request, response);
+        var customRequest = new Request(request);
+        var customResponse = new Response(response);
+
+        listener(customRequest, customResponse);
     });
 
     this.isStarted = true;
@@ -115,12 +119,14 @@ proto.createMiddlewareDecorator = function()
     var self = this;
 
     // Build the middleware list from the configuration
-    // Include a default middleware in order to always display something
-    var middlewares = [bindGenerator(this, defaultMiddleware)];
+    // Include main middleware in order to handle the final response
+    // Each middleware execution are scoped to their container (bundle)
+    var middlewares = [bindGenerator(this, this.mainMiddleware)];
     var total = this.configuration.middlewares.length;
     for (var index = 0; index < total; ++index) {
         var bundleId = this.configuration.middlewares[index];
         var bundle = this.application.getBundle(bundleId);
+
         if (bundle && 'function' === typeof bundle.middleware && 'GeneratorFunction' === bundle.middleware.constructor.name) {
             middlewares = middlewares.concat(bindGenerator(bundle, bundle.middleware));
         }
@@ -141,6 +147,69 @@ proto.createMiddlewareDecorator = function()
 
         yield *previousMiddleware;
     };
+};
+
+/**
+ * The main middleware
+ *
+ * @param   {solfege.bundle.server.Request}     request     The request
+ * @param   {solfege.bundle.server.Response}    response    The response
+ * @param   {GeneratorFunction}                 next        The next function
+ */
+proto.mainMiddleware = function*(request, response, next)
+{
+    // Handle the next middleware
+    yield *next;
+
+    // Variables
+    var body = response.body;
+    var statusCode = response.statusCode;
+    var serverResponse = response.serverResponse;
+
+    // If the headers are sent, then do nothing
+    if (response.headersSent) {
+        return;
+    }
+
+    // Check the status for empty content
+    var noContent = ~[204, 205, 304].indexOf(statusCode);
+
+    // Check if the request method is "HEAD"
+    // Note: The HEAD method is identical to GET except that the server MUST NOT return a message-body in the response.
+    if ('HEAD' === request.method) {
+        noContent = true;
+    }
+
+    // No content
+    if (noContent) {
+
+        // Close the stream if necessary
+        if (body && 'function' === typeof body.pipe) {
+            body.close();
+        }
+
+        return serverResponse.end();
+    }
+
+    // No body
+    if (null === body) {
+        body = response.statusString;
+    }
+
+    // String body
+    if ('string' === typeof body) {
+        return serverResponse.end(body);
+    }
+
+    // Buffer body
+    if (Buffer.isBuffer(body)) {
+        return serverResponse.end(body);
+    }
+
+    // Stream body
+    if ('function' == typeof body.pipe) {
+        return body.pipe(serverResponse);
+    }
 };
 
 /**
