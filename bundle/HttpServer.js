@@ -269,12 +269,29 @@ proto.createMiddlewareDecorator = function()
     var middlewares = [bindGenerator(this, this.mainMiddleware)];
     var total = this.configuration.middlewares.length;
     for (var index = 0; index < total; ++index) {
-        var bundleId = this.configuration.middlewares[index];
-        var bundle = this.application.getBundle(bundleId);
+        var middleware = this.configuration.middlewares[index];
 
-        if (bundle && 'function' === typeof bundle.middleware && 'GeneratorFunction' === bundle.middleware.constructor.name) {
-            middlewares = middlewares.concat(bindGenerator(bundle, bundle.middleware));
+        // If the middleware is a function, then include it without the scope
+        if ('function' === typeof middleware) {
+            if ('GeneratorFunction' === middleware.constructor.name) {
+                middlewares.push(middleware);
+            } else {
+                console.error('The middleware ' + index + ' must be a generator');
+            }
+            continue;
         }
+
+        // If the middleware is a string, then parse it as a Solfege URI
+        if ('string' === typeof middleware) {
+            var solfegeUri = middleware;
+            var bundle = this.application.getBundleFromSolfegeUri(solfegeUri, this);
+            middleware = this.application.parseSolfegeUri(solfegeUri, this);
+
+            if (bundle && 'function' === typeof middleware && 'GeneratorFunction' === middleware.constructor.name) {
+                middlewares.push(bindGenerator(bundle, middleware));
+            }
+        }
+
     }
 
     // Build the top decorator
