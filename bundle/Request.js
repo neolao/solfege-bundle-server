@@ -13,6 +13,9 @@ var Request = solfege.util.Class.create(function(serverRequest)
     // Copy some informations
     this.url = serverRequest.url;
 
+    // Initialize the parameters
+    this.parameters = {};
+
 }, 'solfege.bundle.server.Request');
 var proto = Request.prototype;
 
@@ -20,8 +23,17 @@ var proto = Request.prototype;
  * The original request
  *
  * @type {Object}
+ * @api public
  */
 proto.serverRequest;
+
+/**
+ * The parameters
+ *
+ * @type {Object}
+ * @api private
+ */
+proto.parameters;
 
 /**
  * The request URL
@@ -45,6 +57,27 @@ Object.defineProperty(proto, 'method',
     }
 });
 
+/**
+ * Get a parameter value
+ *
+ * @param   {String}    name    The parameter name
+ * @return  {any}               The parameter value
+ */
+proto.getParameter = function(name)
+{
+    return this.parameters[name];
+};
+
+/**
+ * Set a parameter value
+ *
+ * @param   {String}    name    The parameter name
+ * @param   {any}               The parameter value
+ */
+proto.setParameter = function(name, value)
+{
+    this.parameters[name] = value;
+};
 
 
 module.exports = Request;

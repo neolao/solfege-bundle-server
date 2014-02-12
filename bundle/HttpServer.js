@@ -80,6 +80,71 @@ proto.overrideConfiguration = function*(customConfiguration)
 };
 
 /**
+ * Start the daemon
+ *
+ * @api public
+ */
+proto.startDaemon = function*()
+{
+    // If the "__daemon" environment variable is set, then it is a child process
+    if (process.env.__daemon) {
+        // Start the server
+        yield this.start();
+        return;
+    }
+
+    // Indicates that the next execution of this function is a daemon
+    process.env.__daemon = 1;
+
+    // Variables
+    var spawn = require('child_process').spawn;
+    var fs = require('fs');
+    var nodePath = this.application.nodePath;
+    var nodeArguments = this.application.nodeArguments;
+    var scriptPath = this.application.scriptPath;
+    var scriptArguments = this.application.scriptArguments;
+
+    // Spawn the same command line
+    var args = [].concat(this.application.commandLine);
+    args.shift();
+    var child = spawn(nodePath, args, {
+        stdio: ['ignore', 'ignore', 'ignore'],
+        detached: true
+    });
+    child.unref();
+
+    // Create the pid file
+    var pid = child.pid;
+    var pidPath = 'server.pid';
+    try {
+        fs.statSync(pidPath);
+        console.error('The daemon is already started. Check the pid file: ' + pidPath);
+        child.kill();
+        return;
+    } catch (error) {
+    }
+    try {
+        fs.writeFileSync(pidPath, pid);
+    } catch (error) {
+        console.error('Unable to write the file ' + pidPath);
+        child.kill();
+        return;
+    }
+
+    console.log('Daemon started (PID: ' + pid + ')');
+};
+
+/**
+ * Check the daemon
+ *
+ * @api public
+ */
+proto.checkDaemon = function*()
+{
+    // Check the pid file
+};
+
+/**
  * Start the server
  *
  * @api public
