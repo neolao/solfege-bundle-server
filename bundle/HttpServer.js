@@ -90,37 +90,43 @@ proto.startDaemon = function*()
     if (process.env.__daemon) {
         // Start the server
         yield this.start();
-        return;
+        return true;
     }
 
     // Indicates that the next execution of this function is a daemon
-    process.env.__daemon = 1;
+    process.env.__daemon = true;
 
     // Variables
     var spawn = require('child_process').spawn;
     var fs = require('fs');
+    var configuration = this.configuration;
     var nodePath = this.application.nodePath;
-    var nodeArguments = this.application.nodeArguments;
-    var scriptPath = this.application.scriptPath;
-    var scriptArguments = this.application.scriptArguments;
+
+    // Log file
+    var output = 'ignore';
+    try {
+        if (configuration.daemon.logPath) {
+            output = fs.openSync(configuration.daemon.logPath, 'a');
+        }
+    } catch (error) {
+        output = 'ignore';
+    }
 
     // Spawn the same command line
     var args = [].concat(this.application.commandLine);
     args.shift();
     var child = spawn(nodePath, args, {
-        stdio: ['ignore', 'ignore', 'ignore'],
-        detached: true
+        stdio: ['ignore', output, output]
     });
-    child.unref();
 
     // Create the pid file
     var pid = child.pid;
-    var pidPath = 'server.pid';
+    var pidPath = configuration.daemon.pidPath;
     try {
-        fs.statSync(pidPath);
-        console.error('The daemon is already started. Check the pid file: ' + pidPath);
+        pid = fs.readFileSync(pidPath);
+        console.error('The daemon is already started (PID: ' + pid + ')');
         child.kill();
-        return;
+        return false;
     } catch (error) {
     }
     try {
@@ -128,10 +134,73 @@ proto.startDaemon = function*()
     } catch (error) {
         console.error('Unable to write the file ' + pidPath);
         child.kill();
-        return;
+        return false;
     }
 
     console.log('Daemon started (PID: ' + pid + ')');
+    child.unref();
+    return true;
+};
+
+/**
+ * Stop the daemon
+ *
+ * @api public
+ */
+proto.stopDaemon = function*()
+{
+    var fs = require('fs');
+    var pidPath = this.configuration.daemon.pidPath;
+
+    // Get the pid
+    try {
+        var pid = fs.readFileSync(pidPath);
+    } catch (error) {
+        console.error('Unable to read the file ' + pidPath);
+        return false;
+    }
+
+    // Delete the pid file
+    try {
+        fs.unlinkSync(pidPath);
+    } catch (error) {
+        console.error('Unable to delete the file ' + pidPath);
+        return false;
+    }
+
+    // Kill the daemon
+    try {
+        process.kill(pid);
+    } catch (error) {
+        console.error('Unable to kill the process ' + pid);
+        return false;
+    }
+
+    console.log('Daemon stopped');
+    return true;
+};
+
+/**
+ * Restart the daemon
+ *
+ * @api public
+ */
+proto.restartDaemon = function*()
+{
+    // If the "__daemon" environment variable is set, then it is a child process
+    if (process.env.__daemon) {
+        // Start the server
+        yield this.start();
+        return true;
+    }
+
+    var stopped = yield this.stopDaemon();
+    if (stopped) {
+        yield this.startDaemon();
+        return true;
+    }
+
+    return false;
 };
 
 /**
@@ -141,7 +210,18 @@ proto.startDaemon = function*()
  */
 proto.checkDaemon = function*()
 {
-    // Check the pid file
+    var fs = require('fs');
+    var pidPath = this.configuration.daemon.pidPath;
+
+    // Get the pid
+    try {
+        var pid = fs.readFileSync(pidPath);
+    } catch (error) {
+        console.log('The daemon is not running');
+        return false;
+    }
+
+    console.log('The daemon is running');
 };
 
 /**
