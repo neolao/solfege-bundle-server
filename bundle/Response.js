@@ -16,6 +16,7 @@ var Response = solfege.util.Class.create(function(serverResponse)
     this.removeHeader = serverResponse.removeHeader.bind(serverResponse);
 
     // Set default values
+    this.parameters = {};
     this.statusCode = 404;
     this.body = null;
 
@@ -45,6 +46,14 @@ proto.setHeader;
  * @api public
  */
 proto.removeHeader;
+
+/**
+ * Parameters for the template engine
+ *
+ * @type {Object}
+ * @api public
+ */
+proto.parameters;
 
 /**
  * The private body
