@@ -58,6 +58,18 @@ Object.defineProperty(proto, 'method',
 });
 
 /**
+ * Get a header
+ *
+ * @param   {String}    name    The header name
+ * @return  {String}            The header value
+ */
+proto.getHeader = function(name)
+{
+    name = name.toLowerCase();
+    return this.serverRequest.headers[name];
+};
+
+/**
  * Get a parameter value
  *
  * @param   {String}    name    The parameter name
