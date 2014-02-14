@@ -2,6 +2,7 @@ var solfege = require('solfegejs');
 var Request = require('./Request');
 var Response = require('./Response');
 var http = require('http');
+var Stream = require('stream');
 var co = require('co');
 
 /**
@@ -369,7 +370,7 @@ proto.mainMiddleware = function*(request, response, next)
     }
 
     // Stream body
-    if ('function' == typeof body.pipe) {
+    if (body instanceof Stream) {
         return body.pipe(serverResponse);
     }
 };
