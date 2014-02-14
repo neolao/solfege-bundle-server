@@ -11,7 +11,8 @@ var Response = solfege.util.Class.create(function(serverResponse)
     // Save the original response
     this.serverResponse = serverResponse;
 
-    // Copy some function and informations
+    // Copy some functions and informations
+    this.getHeader = serverResponse.getHeader.bind(serverResponse);
     this.setHeader = serverResponse.setHeader.bind(serverResponse);
     this.removeHeader = serverResponse.removeHeader.bind(serverResponse);
 
