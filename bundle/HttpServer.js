@@ -286,7 +286,7 @@ proto.createMiddlewareDecorator = function()
         if ('string' === typeof middleware) {
             var solfegeUri = middleware;
             var bundle = this.application.getBundleFromSolfegeUri(solfegeUri, this);
-            middleware = this.application.parseSolfegeUri(solfegeUri, this);
+            middleware = this.application.resolveSolfegeUri(solfegeUri, this);
 
             if (bundle && 'function' === typeof middleware && 'GeneratorFunction' === middleware.constructor.name) {
                 middlewares.push(bindGenerator(bundle, middleware));
