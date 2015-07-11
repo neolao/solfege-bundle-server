@@ -1,160 +1,134 @@
-var solfege = require('solfegejs');
-var http = require('http');
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var _solfegejs = require("solfegejs");
+
+var _solfegejs2 = _interopRequireDefault(_solfegejs);
+
+var _http = require("http");
+
+var _http2 = _interopRequireDefault(_http);
 
 /**
  * A response
- *
- * @param   {Object}    serverResponse      The original response
  */
-var Response = solfege.util.Class.create(function(serverResponse)
-{
-    // Save the original response
-    this.serverResponse = serverResponse;
 
-    // Copy some functions and informations
-    this.getHeader = serverResponse.getHeader.bind(serverResponse);
-    this.setHeader = serverResponse.setHeader.bind(serverResponse);
-    this.removeHeader = serverResponse.removeHeader.bind(serverResponse);
+var Response = (function () {
+    /**
+     * Constructor
+     *
+     * @param   {Object}    serverResponse      The original response
+     */
 
-    // Set default values
-    this.parameters = {};
-    this.statusCode = 404;
-    this.body = null;
+    function Response(serverResponse) {
+        _classCallCheck(this, Response);
 
-}, 'solfege.bundle.server.Response');
-var proto = Response.prototype;
+        // Save the original response
+        this.serverResponse = serverResponse;
 
-/**
- * The original response
- *
- * @type {Object}
- * @api private
- */
-proto.serverResponse;
+        // Copy some functions and informations
+        this.getHeader = serverResponse.getHeader.bind(serverResponse);
+        this.setHeader = serverResponse.setHeader.bind(serverResponse);
+        this.removeHeader = serverResponse.removeHeader.bind(serverResponse);
 
-/**
- * Set a header
- *
- * @type {Function}
- * @api public
- */
-proto.setHeader;
-
-/**
- * Remove a header
- *
- * @type {Function}
- * @api public
- */
-proto.removeHeader;
-
-/**
- * Parameters for the template engine
- *
- * @type {Object}
- * @api public
- */
-proto.parameters;
-
-/**
- * The private body
- *
- * @type {any}
- * @api private
- */
-proto._body;
-
-/**
- * The status code
- *
- * @type {Number}
- * @api public
- */
-Object.defineProperty(proto, 'statusCode',
-{
-    get: function()
-    {
-        return this.serverResponse.statusCode;
-    },
-    set: function(value)
-    {
-        this.serverResponse.statusCode = value;
+        // Set default values
+        this.parameters = {};
+        this.statusCode = 404;
+        this.body = null;
     }
-});
 
-/**
- * The status string
- *
- * @type {String}
- * @api public
- */
-Object.defineProperty(proto, 'statusString',
-{
-    get: function()
-    {
-        return http.STATUS_CODES[this.statusCode];
-    }
-});
+    _createClass(Response, [{
+        key: "statusCode",
 
-/**
- * Indicates that the headers are sent
- *
- * @type {Boolean}
- * @api public
- */
-Object.defineProperty(proto, 'headersSent',
-{
-    get: function()
-    {
-        return this.serverResponse.headersSent;
-    }
-});
-
-/**
- * The response body
- *
- * @type {any}
- * @api public
- */
-Object.defineProperty(proto, 'body',
-{
-    get: function()
-    {
-        return this._body;
-    },
-    set: function(value)
-    {
-        this._body = value;
-
-        // No content
-        if (null === value) {
-            this.removeHeader('Content-Type');
-            this.removeHeader('Content-Length');
-            this.removeHeader('Transfer-Encoding');
-            return;
+        /**
+         * The status code
+         *
+         * @type {Number}
+         * @api public
+         */
+        get: function get() {
+            return this.serverResponse.statusCode;
+        },
+        set: function set(value) {
+            this.serverResponse.statusCode = value;
         }
+    }, {
+        key: "statusString",
 
-    }
-});
+        /**
+         * The status string
+         *
+         * @type {String}
+         * @api public
+         */
+        get: function get() {
+            return _http2["default"].STATUS_CODES[this.statusCode];
+        }
+    }, {
+        key: "headerSent",
 
-/**
- * The body length
- *
- * @type {Number}
- * @api public
- */
-Object.defineProperty(proto, 'length',
-{
-    get: function()
-    {
-        var length = this.serverResponse._headers['content-length'];
+        /**
+         * Indicates that the headers are sent
+         *
+         * @type {Boolean}
+         * @api public
+         */
+        get: function get() {
+            return this.serverResponse.headersSent;
+        }
+    }, {
+        key: "body",
 
-        return ~~length;
-    },
-    set: function(value)
-    {
-        this.setHeader('Content-Length', value);
-    }
-});
+        /**
+         * The response body
+         *
+         * @type {any}
+         * @api public
+         */
+        get: function get() {
+            return this._body;
+        },
+        set: function set(value) {
+            this._body = value;
 
-module.exports = Response;
+            // No content
+            if (null === value) {
+                this.removeHeader("Content-Type");
+                this.removeHeader("Content-Length");
+                this.removeHeader("Transfer-Encoding");
+                return;
+            }
+        }
+    }, {
+        key: "length",
+
+        /**
+         * The body length
+         *
+         * @type {Number}
+         * @api public
+         */
+        get: function get() {
+            var length = this.serverResponse._headers["content-length"];
+
+            return ~ ~length;
+        },
+        set: function set(value) {
+            this.setHeader("Content-Length", value);
+        }
+    }]);
+
+    return Response;
+})();
+
+exports["default"] = Response;
+module.exports = exports["default"];

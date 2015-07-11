@@ -1,5 +1,17 @@
-var solfege = require('solfegejs');
+/**
+ * @namespace solfege.bundle.server
+ */
+"use strict";
 
-var currentPackage = solfege.util.ObjectProxy.createPackage(__dirname);
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-module.exports = currentPackage;
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var _solfegejs = require("solfegejs");
+
+var _solfegejs2 = _interopRequireDefault(_solfegejs);
+
+exports["default"] = _solfegejs2["default"].util.ObjectProxy.createPackage(__dirname);
+module.exports = exports["default"];

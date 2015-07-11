@@ -1,12 +1,33 @@
-var solfege = require('solfegejs');
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var _solfegejs = require("solfegejs");
+
+var _solfegejs2 = _interopRequireDefault(_solfegejs);
 
 /**
  * A request
- *
- * @param   {Object}    serverRequest       The original request
  */
-var Request = solfege.util.Class.create(function(serverRequest)
-{
+
+var Request = (function () {
+  /**
+   * Constructor
+   *
+   * @param   {Object}    serverRequest       The original request
+   */
+
+  function Request(serverRequest) {
+    _classCallCheck(this, Request);
+
     // Save the original request
     this.serverRequest = serverRequest;
 
@@ -15,81 +36,61 @@ var Request = solfege.util.Class.create(function(serverRequest)
 
     // Initialize the parameters
     this.parameters = {};
+  }
 
-}, 'solfege.bundle.server.Request');
-var proto = Request.prototype;
+  _createClass(Request, [{
+    key: "getHeader",
 
-/**
- * The original request
- *
- * @type {Object}
- * @api public
- */
-proto.serverRequest;
-
-/**
- * The parameters
- *
- * @type {Object}
- * @api private
- */
-proto.parameters;
-
-/**
- * The request URL
- *
- * @type {String}
- * @api public
- */
-proto.url;
-
-/**
- * The method of the request
- *
- * @type {String}
- * @api public
- */
-Object.defineProperty(proto, 'method',
-{
-    get: function()
-    {
-        return this.serverRequest.method;
+    /**
+     * Get a header
+     *
+     * @param   {String}    name    The header name
+     * @return  {String}            The header value
+     */
+    value: function getHeader(name) {
+      name = name.toLowerCase();
+      return this.serverRequest.headers[name];
     }
-});
+  }, {
+    key: "getParameter",
 
-/**
- * Get a header
- *
- * @param   {String}    name    The header name
- * @return  {String}            The header value
- */
-proto.getHeader = function(name)
-{
-    name = name.toLowerCase();
-    return this.serverRequest.headers[name];
-};
+    /**
+     * Get a parameter value
+     *
+     * @param   {String}    name    The parameter name
+     * @return  {any}               The parameter value
+     */
+    value: function getParameter(name) {
+      return this.parameters[name];
+    }
+  }, {
+    key: "setParameter",
 
-/**
- * Get a parameter value
- *
- * @param   {String}    name    The parameter name
- * @return  {any}               The parameter value
- */
-proto.getParameter = function(name)
-{
-    return this.parameters[name];
-};
+    /**
+     * Set a parameter value
+     *
+     * @param   {String}    name    The parameter name
+     * @param   {any}               The parameter value
+     */
+    value: function setParameter(name, value) {
+      this.parameters[name] = value;
+    }
+  }, {
+    key: "method",
 
-/**
- * Set a parameter value
- *
- * @param   {String}    name    The parameter name
- * @param   {any}               The parameter value
- */
-proto.setParameter = function(name, value)
-{
-    this.parameters[name] = value;
-};
+    /**
+     * The method of the request
+     *
+     * @type {String}
+     * @api public
+     */
+    get: function get() {
+      return this.serverRequest.method;
+    }
+  }]);
 
+  return Request;
+})();
 
-module.exports = Request;
+exports["default"] = Request;
+module.exports = exports["default"];
