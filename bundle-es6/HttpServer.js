@@ -61,7 +61,7 @@ export default class HttpServer extends solfege.kernel.EventEmitter
      */
     *overrideConfiguration(customConfiguration:object)
     {
-        this.configuration = solfege.util.Object.merge(this.configuration, customConfiguration);
+        this.configuration = Object.assign(this.configuration, customConfiguration);
     }
 
     /**
