@@ -7,8 +7,6 @@ import co from "co";
 import fs from "fs";
 import {spawn} from "child_process";
 
-let Application = solfege.kernel.Application;
-
 /**
  * A simple HTTP server
  *
@@ -35,7 +33,7 @@ export default class HttpServer extends solfege.kernel.EventEmitter
      *
      * @param   {solfege.kernel.Application}    application     Application instance
      */
-    *setApplication(application:Application)
+    *setApplication(application)
     {
         this.application = application;
 
@@ -217,7 +215,7 @@ export default class HttpServer extends solfege.kernel.EventEmitter
 
         // Build the main listener
         let decorator = this.createMiddlewareDecorator();
-        let listener = co(decorator);
+        let listener = co.wrap(decorator);
 
         // Create the server
         let server = http.createServer(function(request, response)
@@ -284,7 +282,7 @@ export default class HttpServer extends solfege.kernel.EventEmitter
             let previousMiddleware = next || emptyMiddleware();
 
             while (index--) {
-                var currentMiddleware = middlewares[index];
+                let currentMiddleware = middlewares[index];
                 previousMiddleware = currentMiddleware(request, response, previousMiddleware);
             }
 

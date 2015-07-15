@@ -46,8 +46,6 @@ var _fs2 = _interopRequireDefault(_fs);
 
 var _child_process = require("child_process");
 
-var Application = _solfegejs2["default"].kernel.Application;
-
 /**
  * A simple HTTP server
  *
@@ -55,6 +53,8 @@ var Application = _solfegejs2["default"].kernel.Application;
  */
 
 var HttpServer = (function (_solfege$kernel$EventEmitter) {
+    _inherits(HttpServer, _solfege$kernel$EventEmitter);
+
     /**
      * Constructor
      */
@@ -70,8 +70,6 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
         // By default, the server is not started
         this.isStarted = false;
     }
-
-    _inherits(HttpServer, _solfege$kernel$EventEmitter);
 
     _createClass(HttpServer, [{
         key: "setApplication",
@@ -268,7 +266,7 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
 
             // Build the main listener
             var decorator = this.createMiddlewareDecorator();
-            var listener = (0, _co2["default"])(decorator);
+            var listener = _co2["default"].wrap(decorator);
 
             // Create the server
             var server = _http2["default"].createServer(function (request, response) {
