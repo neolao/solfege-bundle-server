@@ -300,7 +300,12 @@ export default class HttpServer extends solfege.kernel.EventEmitter
     *mainMiddleware(request, response, next)
     {
         // Handle the next middleware
-        yield *next;
+        let error;
+        try {
+            yield *next;
+        } catch (middlewareError) {
+            error = middlewareError;
+        }
 
         // Variables
         let body = response.body;
@@ -310,6 +315,13 @@ export default class HttpServer extends solfege.kernel.EventEmitter
         // If the headers are sent, then do nothing
         if (response.headersSent) {
             return;
+        }
+
+        // Handle the error
+        if (error) {
+            console.error(error);
+            serverResponse.statusCode = 500;
+            return serverResponse.end("An error occurred");
         }
 
         // Check the status for empty content

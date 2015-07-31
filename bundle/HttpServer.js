@@ -350,7 +350,12 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
          */
         value: function* mainMiddleware(request, response, next) {
             // Handle the next middleware
-            yield* next;
+            var error = undefined;
+            try {
+                yield* next;
+            } catch (middlewareError) {
+                error = middlewareError;
+            }
 
             // Variables
             var body = response.body;
@@ -360,6 +365,13 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
             // If the headers are sent, then do nothing
             if (response.headersSent) {
                 return;
+            }
+
+            // Handle the error
+            if (error) {
+                console.error(error);
+                serverResponse.statusCode = 500;
+                return serverResponse.end("An error occurred");
             }
 
             // Check the status for empty content
