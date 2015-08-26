@@ -319,7 +319,7 @@ export default class HttpServer extends solfege.kernel.EventEmitter
 
         // Handle the error
         if (error) {
-            console.error(error);
+            console.error(error.stack);
             serverResponse.statusCode = 500;
             return serverResponse.end("An error occurred");
         }
