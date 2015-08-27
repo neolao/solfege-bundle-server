@@ -42,8 +42,6 @@ var Response = (function () {
 
         // Set default values
         this.parameters = {};
-        this.statusCode = 404;
-        this.body = null;
     }
 
     _createClass(Response, [{

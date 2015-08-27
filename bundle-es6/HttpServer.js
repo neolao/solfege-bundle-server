@@ -363,6 +363,11 @@ export default class HttpServer extends solfege.kernel.EventEmitter
         if (body instanceof Stream) {
             return body.pipe(serverResponse);
         }
+
+        // File not found
+        serverResponse.setHeader('Content-Type', 'text/plain');
+        serverResponse.statusCode = 404;
+        return serverResponse.end("Not found");
     };
 
     /**

@@ -413,6 +413,11 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
             if (body instanceof _stream2["default"]) {
                 return body.pipe(serverResponse);
             }
+
+            // File not found
+            serverResponse.setHeader("Content-Type", "text/plain");
+            serverResponse.statusCode = 404;
+            return serverResponse.end("Not found");
         }
     }, {
         key: "onApplicationEnd",

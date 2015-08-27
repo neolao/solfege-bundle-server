@@ -23,9 +23,6 @@ export default class Response
 
         // Set default values
         this.parameters = {};
-        this.statusCode = 404;
-        this.body = null;
-
     }
 
     /**
