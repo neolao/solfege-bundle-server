@@ -14,7 +14,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var _solfegejs = require("solfegejs");
 
@@ -65,20 +65,20 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
         _get(Object.getPrototypeOf(HttpServer.prototype), "constructor", this).call(this);
 
         // Set the default configuration
-        this.configuration = require("../configuration/default.js");
+        this.configuration = require('../configuration/default.js');
 
         // By default, the server is not started
         this.isStarted = false;
     }
 
+    /**
+     * Set the application
+     *
+     * @param   {solfege.kernel.Application}    application     Application instance
+     */
+
     _createClass(HttpServer, [{
         key: "setApplication",
-
-        /**
-         * Set the application
-         *
-         * @param   {solfege.kernel.Application}    application     Application instance
-         */
         value: function* setApplication(application) {
             this.application = application;
 
@@ -86,36 +86,36 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
             var bindGenerator = _solfegejs2["default"].util.Function.bindGenerator;
             this.application.on(_solfegejs2["default"].kernel.Application.EVENT_END, bindGenerator(this, this.onApplicationEnd));
         }
-    }, {
-        key: "getConfiguration",
 
         /**
          * Get the configuration
          *
          * @return  {Object}    The configuration
          */
+    }, {
+        key: "getConfiguration",
         value: function getConfiguration() {
             return this.configuration;
         }
-    }, {
-        key: "overrideConfiguration",
 
         /**
          * Override the current configuration
          *
          * @param   {Object}    customConfiguration     The custom configuration
          */
+    }, {
+        key: "overrideConfiguration",
         value: function* overrideConfiguration(customConfiguration) {
             this.configuration = _extends(this.configuration, customConfiguration);
         }
-    }, {
-        key: "startDaemon",
 
         /**
          * Start the daemon
          *
          * @api public
          */
+    }, {
+        key: "startDaemon",
         value: function* startDaemon() {
             // If the "__daemon" environment variable is set, then it is a child process
             if (process.env.__daemon) {
@@ -132,20 +132,20 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
             var nodePath = this.application.nodePath;
 
             // Log file
-            var output = "ignore";
+            var output = 'ignore';
             try {
                 if (configuration.daemon.logPath) {
-                    output = _fs2["default"].openSync(configuration.daemon.logPath, "a");
+                    output = _fs2["default"].openSync(configuration.daemon.logPath, 'a');
                 }
             } catch (error) {
-                output = "ignore";
+                output = 'ignore';
             }
 
             // Spawn the same command line
             var args = [].concat(this.application.commandLine);
             args.shift();
             var child = (0, _child_process.spawn)(nodePath, args, {
-                stdio: ["ignore", output, output]
+                stdio: ['ignore', output, output]
             });
 
             // Create the pid file
@@ -153,30 +153,30 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
             var pidPath = configuration.daemon.pidPath;
             try {
                 pid = _fs2["default"].readFileSync(pidPath);
-                console.error("The daemon is already started (PID: " + pid + ")");
+                console.error('The daemon is already started (PID: ' + pid + ')');
                 child.kill();
                 return false;
             } catch (error) {}
             try {
                 _fs2["default"].writeFileSync(pidPath, pid);
             } catch (error) {
-                console.error("Unable to write the file " + pidPath);
+                console.error('Unable to write the file ' + pidPath);
                 child.kill();
                 return false;
             }
 
-            console.log("Daemon started (PID: " + pid + ")");
+            console.log('Daemon started (PID: ' + pid + ')');
             child.unref();
             return true;
         }
-    }, {
-        key: "stopDaemon",
 
         /**
          * Stop the daemon
          *
          * @api public
          */
+    }, {
+        key: "stopDaemon",
         value: function* stopDaemon() {
             var pidPath = this.configuration.daemon.pidPath;
 
@@ -184,7 +184,7 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
             try {
                 var _pid = _fs2["default"].readFileSync(pidPath);
             } catch (error) {
-                console.error("Unable to read the file " + pidPath);
+                console.error('Unable to read the file ' + pidPath);
                 return false;
             }
 
@@ -192,7 +192,7 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
             try {
                 _fs2["default"].unlinkSync(pidPath);
             } catch (error) {
-                console.error("Unable to delete the file " + pidPath);
+                console.error('Unable to delete the file ' + pidPath);
                 return false;
             }
 
@@ -200,21 +200,21 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
             try {
                 process.kill(pid);
             } catch (error) {
-                console.error("Unable to kill the process " + pid);
+                console.error('Unable to kill the process ' + pid);
                 return false;
             }
 
-            console.log("Daemon stopped");
+            console.log('Daemon stopped');
             return true;
         }
-    }, {
-        key: "restartDaemon",
 
         /**
          * Restart the daemon
          *
          * @api public
          */
+    }, {
+        key: "restartDaemon",
         value: function* restartDaemon() {
             // If the "__daemon" environment variable is set, then it is a child process
             if (process.env.__daemon) {
@@ -231,14 +231,14 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
 
             return false;
         }
-    }, {
-        key: "checkDaemon",
 
         /**
          * Check the daemon
          *
          * @api public
          */
+    }, {
+        key: "checkDaemon",
         value: function* checkDaemon() {
             var pidPath = this.configuration.daemon.pidPath;
 
@@ -246,20 +246,20 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
             try {
                 var _pid2 = _fs2["default"].readFileSync(pidPath);
             } catch (error) {
-                console.log("The daemon is not running");
+                console.log('The daemon is not running');
                 return false;
             }
 
-            console.log("The daemon is running");
+            console.log('The daemon is running');
         }
-    }, {
-        key: "start",
 
         /**
          * Start the server
          *
          * @api public
          */
+    }, {
+        key: "start",
         value: function* start() {
             var self = this;
             var port = this.configuration.port;
@@ -277,17 +277,17 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
             });
 
             this.isStarted = true;
-            console.log("SolfegeJS HTTP server started on port " + port);
+            console.log('SolfegeJS HTTP server started on port ' + port);
             server.listen.apply(server, [port]);
         }
-    }, {
-        key: "createMiddlewareDecorator",
 
         /**
          * Create the middleware decorator with the middleware list
          *
          * @return  {GeneratorFunction}     The middleware decorator
          */
+    }, {
+        key: "createMiddlewareDecorator",
         value: function createMiddlewareDecorator() {
             var self = this;
             var emptyMiddleware = function* emptyMiddleware() {};
@@ -302,22 +302,22 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
                 var middleware = this.configuration.middlewares[index];
 
                 // If the middleware is a function, then include it without the scope
-                if ("function" === typeof middleware) {
-                    if ("GeneratorFunction" === middleware.constructor.name) {
+                if ('function' === typeof middleware) {
+                    if ('GeneratorFunction' === middleware.constructor.name) {
                         middlewares.push(middleware);
                     } else {
-                        console.error("The middleware " + index + " must be a generator");
+                        console.error('The middleware ' + index + ' must be a generator');
                     }
                     continue;
                 }
 
                 // If the middleware is a string, then parse it as a Solfege URI
-                if ("string" === typeof middleware) {
+                if ('string' === typeof middleware) {
                     var solfegeUri = middleware;
                     var bundle = this.application.getBundleFromSolfegeUri(solfegeUri, this);
                     middleware = this.application.resolveSolfegeUri(solfegeUri, this);
 
-                    if (bundle && "function" === typeof middleware && "GeneratorFunction" === middleware.constructor.name) {
+                    if (bundle && 'function' === typeof middleware && 'GeneratorFunction' === middleware.constructor.name) {
                         middlewares.push(bindGenerator(bundle, middleware));
                     }
                 }
@@ -338,8 +338,6 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
                 yield* previousMiddleware;
             };
         }
-    }, {
-        key: "mainMiddleware",
 
         /**
          * The main middleware
@@ -348,6 +346,8 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
          * @param   {solfege.bundle.server.Response}    response    The response
          * @param   {GeneratorFunction}                 next        The next function
          */
+    }, {
+        key: "mainMiddleware",
         value: function* mainMiddleware(request, response, next) {
             // Handle the next middleware
             var error = undefined;
@@ -379,7 +379,7 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
 
             // Check if the request method is "HEAD"
             // Note: The HEAD method is identical to GET except that the server MUST NOT return a message-body in the response.
-            if ("HEAD" === request.method) {
+            if ('HEAD' === request.method) {
                 noContent = true;
             }
 
@@ -387,7 +387,7 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
             if (noContent) {
 
                 // Close the stream if necessary
-                if (body && "function" === typeof body.pipe) {
+                if (body && 'function' === typeof body.pipe) {
                     body.close();
                 }
 
@@ -400,7 +400,7 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
             }
 
             // String body
-            if ("string" === typeof body) {
+            if ('string' === typeof body) {
                 return serverResponse.end(body);
             }
 
@@ -415,7 +415,7 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
             }
 
             // File not found
-            serverResponse.setHeader("Content-Type", "text/plain");
+            serverResponse.setHeader('Content-Type', 'text/plain');
             serverResponse.statusCode = 404;
             return serverResponse.end("Not found");
         }
@@ -427,7 +427,7 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
          */
         value: function* onApplicationEnd() {
             if (this.isStarted) {
-                console.log("\nSolfegeJS HTTP server stopped");
+                console.log('\nSolfegeJS HTTP server stopped');
             }
         }
     }]);

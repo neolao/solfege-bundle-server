@@ -44,23 +44,21 @@ var Response = (function () {
         this.parameters = {};
     }
 
+    /**
+     * The status code
+     *
+     * @type {Number}
+     * @api public
+     */
+
     _createClass(Response, [{
         key: "statusCode",
-
-        /**
-         * The status code
-         *
-         * @type {Number}
-         * @api public
-         */
         get: function get() {
             return this.serverResponse.statusCode;
         },
         set: function set(value) {
             this.serverResponse.statusCode = value;
         }
-    }, {
-        key: "statusString",
 
         /**
          * The status string
@@ -68,11 +66,11 @@ var Response = (function () {
          * @type {String}
          * @api public
          */
+    }, {
+        key: "statusString",
         get: function get() {
             return _http2["default"].STATUS_CODES[this.statusCode];
         }
-    }, {
-        key: "headerSent",
 
         /**
          * Indicates that the headers are sent
@@ -80,11 +78,11 @@ var Response = (function () {
          * @type {Boolean}
          * @api public
          */
+    }, {
+        key: "headerSent",
         get: function get() {
             return this.serverResponse.headersSent;
         }
-    }, {
-        key: "body",
 
         /**
          * The response body
@@ -92,6 +90,8 @@ var Response = (function () {
          * @type {any}
          * @api public
          */
+    }, {
+        key: "body",
         get: function get() {
             return this._body;
         },
@@ -100,14 +100,12 @@ var Response = (function () {
 
             // No content
             if (null === value) {
-                this.removeHeader("Content-Type");
-                this.removeHeader("Content-Length");
-                this.removeHeader("Transfer-Encoding");
+                this.removeHeader('Content-Type');
+                this.removeHeader('Content-Length');
+                this.removeHeader('Transfer-Encoding');
                 return;
             }
         }
-    }, {
-        key: "length",
 
         /**
          * The body length
@@ -115,13 +113,15 @@ var Response = (function () {
          * @type {Number}
          * @api public
          */
+    }, {
+        key: "length",
         get: function get() {
-            var length = this.serverResponse._headers["content-length"];
+            var length = this.serverResponse._headers['content-length'];
 
             return ~ ~length;
         },
         set: function set(value) {
-            this.setHeader("Content-Length", value);
+            this.setHeader('Content-Length', value);
         }
     }]);
 

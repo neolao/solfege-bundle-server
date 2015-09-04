@@ -1,4 +1,6 @@
 import solfege from "solfegejs";
+import getRawBody from "raw-body";
+import formidable from "formidable";
 
 /**
  * A request
@@ -21,6 +23,14 @@ export default class Request
         // Initialize the parameters
         this.parameters = {};
 
+        // The fields sent
+        this.fields = null;
+
+        // The files sent
+        this.files = null;
+
+        // The raw body
+        this.rawBody = null;
     }
 
     /**
@@ -68,5 +78,89 @@ export default class Request
         this.parameters[name] = value;
     }
 
+    /**
+     * Get the raw body
+     *
+     * @param   {Object}    options     The options (see "raw-body" module)
+     * @return  {String}                The raw body
+     */
+    *getRawBody(options)
+    {
+        if (this.rawBody !== null) {
+            return this.rawBody;
+        }
+
+        let rawBody = yield getRawBody(this.serverRequest, options);
+        this.rawBody = rawBody;
+        return rawBody;
+    }
+
+    /**
+     * Get the fields
+     *
+     * @return  {Object}    The fields
+     */
+    *getFields()
+    {
+        // Get the cached property
+        if (this.fields !== null) {
+            return this.fields;
+        }
+
+        let data = yield this.getFieldsAndFiles();
+        return data.fields;
+    }
+
+
+    /**
+     * Get the files
+     *
+     * @return  {Object}    The files
+     */
+    *getFiles()
+    {
+        // Get the cached property
+        if (this.files !== null) {
+            return this.files;
+        }
+
+        let data = yield this.getFieldsAndFiles();
+        return data.files;
+    }
+
+    /**
+     * Get the fields and files
+     *
+     * @return  {Object}    The object containing the fields and files
+     */
+    *getFieldsAndFiles()
+    {
+        // Get the cached properties
+        if (this.fields !== null && this.fields !== null) {
+            return {
+                fields: this.fields,
+                files: this.files
+            };
+        }
+
+        // Extract the properties from the request
+        let self = this;
+        return new Promise(function(resolve, reject) {
+            let form = formidable.IncomingForm();
+            form.parse(this.serverRequest, function(error, fields, files) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+
+                self.fields = fields;
+                self.files = files;
+                return {
+                    fields: fields,
+                    files: files
+                };
+            });
+        });
+    }
 }
 
