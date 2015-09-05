@@ -147,7 +147,7 @@ export default class Request
         let self = this;
         return new Promise(function(resolve, reject) {
             let form = formidable.IncomingForm();
-            form.parse(this.serverRequest, function(error, fields, files) {
+            form.parse(self.serverRequest, function(error, fields, files) {
                 if (error) {
                     reject(error);
                     return;

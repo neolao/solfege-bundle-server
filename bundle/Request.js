@@ -172,7 +172,7 @@ var Request = (function () {
             var self = this;
             return new Promise(function (resolve, reject) {
                 var form = _formidable2["default"].IncomingForm();
-                form.parse(this.serverRequest, function (error, fields, files) {
+                form.parse(self.serverRequest, function (error, fields, files) {
                     if (error) {
                         reject(error);
                         return;
