@@ -14,6 +14,10 @@ var _solfegejs = require("solfegejs");
 
 var _solfegejs2 = _interopRequireDefault(_solfegejs);
 
+var _url = require("url");
+
+var _querystring = require("querystring");
+
 var _rawBody = require("raw-body");
 
 var _rawBody2 = _interopRequireDefault(_rawBody);
@@ -42,6 +46,10 @@ var Request = (function () {
         // Copy some informations
         this.url = serverRequest.url;
 
+        // Parse the URL
+        this.urlParts = (0, _url.parse)(this.url);
+        this._query = null;
+
         // Initialize the parameters
         this.parameters = {};
 
@@ -59,7 +67,6 @@ var Request = (function () {
      * The method of the request
      *
      * @type {String}
-     * @api public
      */
 
     _createClass(Request, [{
@@ -180,10 +187,10 @@ var Request = (function () {
 
                     self.fields = fields;
                     self.files = files;
-                    return {
+                    resolve({
                         fields: fields,
                         files: files
-                    };
+                    });
                 });
             });
         }
@@ -191,6 +198,106 @@ var Request = (function () {
         key: "method",
         get: function get() {
             return this.serverRequest.method;
+        }
+
+        /**
+         * The protocol
+         *
+         * @type {String}
+         */
+    }, {
+        key: "protocol",
+        get: function get() {
+            return this.urlParts.protocol;
+        }
+
+        /**
+         * The host
+         *
+         * @type {String}
+         */
+    }, {
+        key: "host",
+        get: function get() {
+            return this.urlParts.host;
+        }
+
+        /**
+         * The hostname
+         *
+         * @type {String}
+         */
+    }, {
+        key: "hostname",
+        get: function get() {
+            return this.urlParts.hostname;
+        }
+
+        /**
+         * The port
+         *
+         * @type {Number}
+         */
+    }, {
+        key: "port",
+        get: function get() {
+            return this.urlParts.port;
+        }
+
+        /**
+         * The pathname
+         *
+         * @type {String}
+         */
+    }, {
+        key: "pathname",
+
+        /**
+         * The query string including the leading question mark
+         *
+         * @type {String}
+         */
+        get: function get() {
+            return this.urlParts.pathname;
+        }
+
+        /**
+         * The query string
+         *
+         * @type {String}
+         */
+    }, {
+        key: "queryString",
+        get: function get() {
+            return this.urlParts.query;
+        }
+
+        /**
+         * The query
+         *
+         * @type {Object}
+         */
+    }, {
+        key: "query",
+        get: function get() {
+            if (this._query) {
+                return this._query;
+            }
+
+            this._query = (0, _querystring.parse)(this.queryString);
+
+            return this._query;
+        }
+
+        /**
+         * The hash
+         *
+         * @type {String}
+         */
+    }, {
+        key: "hash",
+        get: function get() {
+            return this.urlParts.hash;
         }
     }]);
 

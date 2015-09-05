@@ -1,4 +1,6 @@
 import solfege from "solfegejs";
+import {parse as parseUrl} from "url";
+import {parse as parseQueryString} from "querystring";
 import getRawBody from "raw-body";
 import formidable from "formidable";
 
@@ -20,6 +22,10 @@ export default class Request
         // Copy some informations
         this.url = serverRequest.url;
 
+        // Parse the URL
+        this.urlParts = parseUrl(this.url);
+        this._query = null;
+
         // Initialize the parameters
         this.parameters = {};
 
@@ -37,11 +43,106 @@ export default class Request
      * The method of the request
      *
      * @type {String}
-     * @api public
      */
     get method()
     {
         return this.serverRequest.method;
+    }
+
+    /**
+     * The protocol
+     *
+     * @type {String}
+     */
+    get protocol()
+    {
+        return this.urlParts.protocol;
+    }
+
+    /**
+     * The host
+     *
+     * @type {String}
+     */
+    get host()
+    {
+        return this.urlParts.host;
+    }
+
+    /**
+     * The hostname
+     *
+     * @type {String}
+     */
+    get hostname()
+    {
+        return this.urlParts.hostname;
+    }
+
+    /**
+     * The port
+     *
+     * @type {Number}
+     */
+    get port()
+    {
+        return this.urlParts.port;
+    }
+
+    /**
+     * The pathname
+     *
+     * @type {String}
+     */
+    get pathname()
+    {
+        return this.urlParts.pathname;
+    }
+
+    /**
+     * The query string including the leading question mark
+     *
+     * @type {String}
+     */
+    get pathname()
+    {
+        return this.urlParts.pathname;
+    }
+
+    /**
+     * The query string
+     *
+     * @type {String}
+     */
+    get queryString()
+    {
+        return this.urlParts.query;
+    }
+
+    /**
+     * The query
+     *
+     * @type {Object}
+     */
+    get query()
+    {
+        if (this._query) {
+            return this._query;
+        }
+
+        this._query = parseQueryString(this.queryString);
+
+        return this._query;
+    }
+
+    /**
+     * The hash
+     *
+     * @type {String}
+     */
+    get hash()
+    {
+        return this.urlParts.hash;
     }
 
     /**
@@ -155,10 +256,10 @@ export default class Request
 
                 self.fields = fields;
                 self.files = files;
-                return {
+                resolve({
                     fields: fields,
                     files: files
-                };
+                });
             });
         });
     }
