@@ -419,12 +419,12 @@ var HttpServer = (function (_solfege$kernel$EventEmitter) {
             serverResponse.statusCode = 404;
             return serverResponse.end("Not found");
         }
-    }, {
-        key: "onApplicationEnd",
 
         /**
          * Executed when the application ends
          */
+    }, {
+        key: "onApplicationEnd",
         value: function* onApplicationEnd() {
             if (this.isStarted) {
                 console.log('\nSolfegeJS HTTP server stopped');

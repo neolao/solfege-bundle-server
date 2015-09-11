@@ -26,6 +26,10 @@ var _formidable = require("formidable");
 
 var _formidable2 = _interopRequireDefault(_formidable);
 
+var _accepts = require("accepts");
+
+var _accepts2 = _interopRequireDefault(_accepts);
+
 /**
  * A request
  */
@@ -61,6 +65,9 @@ var Request = (function () {
 
         // The raw body
         this.rawBody = null;
+
+        // The helper that parse the headers to get informations like charsets, encodings, etc.
+        this.accept = (0, _accepts2["default"])(serverRequest);
     }
 
     /**
@@ -193,6 +200,123 @@ var Request = (function () {
                     });
                 });
             });
+        }
+
+        /**
+         * Return the first accepted charset.
+         * If nothing in charsets is accepted, then false is returned.
+         *
+         * @param   {array}     charsets    Accepted charsets
+         * @return  {string}                First accepted charset
+         */
+    }, {
+        key: "acceptsCharsets",
+        value: function acceptsCharsets() {
+            for (var _len = arguments.length, charsets = Array(_len), _key = 0; _key < _len; _key++) {
+                charsets[_key] = arguments[_key];
+            }
+
+            return this.accept.charset(charsets);
+        }
+
+        /**
+         * Return the charsets that the request accepts, 
+         * in the order of the client's preference (most preferred first).
+         *
+         * @return  {array}     The charsets
+         */
+    }, {
+        key: "charsets",
+        value: function charsets() {
+            return this.accept.charsets();
+        }
+
+        /**
+         * Return the first accepted encoding. 
+         * If nothing in encodings is accepted, then false is returned.
+         *
+         * @param   {array}     encodings   Accepted encodings
+         * @return  {string}                First accepted encoding
+         */
+    }, {
+        key: "acceptsEncodings",
+        value: function acceptsEncodings() {
+            for (var _len2 = arguments.length, encodings = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+                encodings[_key2] = arguments[_key2];
+            }
+
+            return this.accept.encoding(encodings);
+        }
+
+        /**
+         * Return the encodings that the request accepts, 
+         * in the order of the client's preference (most preferred first).
+         *
+         * @return  {array}     The encodings
+         */
+    }, {
+        key: "encodings",
+        value: function encodings() {
+            return this.accept.encodings();
+        }
+
+        /**
+         * Return the first accepted language. 
+         * If nothing in languages is accepted, then false is returned.
+         *
+         * @param   {array}     languages   Accepted languages
+         * @return  {string}                First accepted language
+         */
+    }, {
+        key: "acceptsLanguages",
+        value: function acceptsLanguages() {
+            for (var _len3 = arguments.length, languages = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+                languages[_key3] = arguments[_key3];
+            }
+
+            return this.accept.language(languages);
+        }
+
+        /**
+         * Return the languages that the request accepts, 
+         * in the order of the client's preference (most preferred first).
+         *
+         * @return  {array}     The languages
+         */
+    }, {
+        key: "languages",
+        value: function languages() {
+            return this.accept.languages();
+        }
+
+        /**
+         * Return the first accepted type 
+         * (and it is returned as the same text as what appears in the types array). 
+         * If nothing in types is accepted, then false is returned.
+         *
+         * @param   {array}     types   Accepted types
+         * @return  {string}            First accepted type
+         */
+    }, {
+        key: "acceptsTypes",
+        value: function acceptsTypes() {
+            for (var _len4 = arguments.length, types = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+                types[_key4] = arguments[_key4];
+            }
+
+            return this.accept.type(types);
+        }
+
+        /**
+         * Return the types that the request accepts, 
+         * in the order of the client's preference (most preferred first).
+         *
+         * @return  {array}     The types
+         */
+    }, {
+        key: "types",
+        value: function types() {
+            return this.accept.types();
         }
     }, {
         key: "method",

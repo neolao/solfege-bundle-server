@@ -368,7 +368,7 @@ export default class HttpServer extends solfege.kernel.EventEmitter
         serverResponse.setHeader('Content-Type', 'text/plain');
         serverResponse.statusCode = 404;
         return serverResponse.end("Not found");
-    };
+    }
 
     /**
      * Executed when the application ends

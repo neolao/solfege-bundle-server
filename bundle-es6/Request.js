@@ -3,6 +3,7 @@ import {parse as parseUrl} from "url";
 import {parse as parseQueryString} from "querystring";
 import getRawBody from "raw-body";
 import formidable from "formidable";
+import accepts from "accepts";
 
 /**
  * A request
@@ -37,6 +38,9 @@ export default class Request
 
         // The raw body
         this.rawBody = null;
+
+        // The helper that parse the headers to get informations like charsets, encodings, etc.
+        this.accept = accepts(serverRequest);
     }
 
     /**
@@ -262,6 +266,99 @@ export default class Request
                 });
             });
         });
+    }
+
+    /**
+     * Return the first accepted charset.
+     * If nothing in charsets is accepted, then false is returned.
+     *
+     * @param   {array}     charsets    Accepted charsets
+     * @return  {string}                First accepted charset
+     */
+    acceptsCharsets(...charsets)
+    {
+        return this.accept.charset(charsets);
+    }
+
+    /**
+     * Return the charsets that the request accepts, 
+     * in the order of the client's preference (most preferred first).
+     *
+     * @return  {array}     The charsets
+     */
+    charsets()
+    {
+        return this.accept.charsets();
+    }
+
+    /**
+     * Return the first accepted encoding. 
+     * If nothing in encodings is accepted, then false is returned.
+     *
+     * @param   {array}     encodings   Accepted encodings
+     * @return  {string}                First accepted encoding
+     */
+    acceptsEncodings(...encodings)
+    {
+        return this.accept.encoding(encodings);
+    }
+
+    /**
+     * Return the encodings that the request accepts, 
+     * in the order of the client's preference (most preferred first).
+     *
+     * @return  {array}     The encodings
+     */
+    encodings()
+    {
+        return this.accept.encodings();
+    }
+
+    /**
+     * Return the first accepted language. 
+     * If nothing in languages is accepted, then false is returned.
+     *
+     * @param   {array}     languages   Accepted languages
+     * @return  {string}                First accepted language
+     */
+    acceptsLanguages(...languages)
+    {
+        return this.accept.language(languages);
+    }
+
+    /**
+     * Return the languages that the request accepts, 
+     * in the order of the client's preference (most preferred first).
+     *
+     * @return  {array}     The languages
+     */
+    languages()
+    {
+        return this.accept.languages();
+    }
+
+    /**
+     * Return the first accepted type 
+     * (and it is returned as the same text as what appears in the types array). 
+     * If nothing in types is accepted, then false is returned.
+     *
+     * @param   {array}     types   Accepted types
+     * @return  {string}            First accepted type
+     */
+    acceptsTypes(...types)
+    {
+        return this.accept.type(types);
+    }
+
+    /**
+     * Return the types that the request accepts, 
+     * in the order of the client's preference (most preferred first).
+     *
+     * @return  {array}     The types
+     */
+    types()
+    {
+        return this.accept.types();
     }
 }
 
