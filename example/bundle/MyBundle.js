@@ -4,40 +4,58 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 var _solfegejs = require("solfegejs");
 
 var _solfegejs2 = _interopRequireDefault(_solfegejs);
 
-var Application = _solfegejs2["default"].kernel.Application;
+var _Application = require("solfegejs/lib/kernel/Application");
 
-var MyBundle = (function () {
-    function MyBundle() {
-        _classCallCheck(this, MyBundle);
+var _Application2 = _interopRequireDefault(_Application);
+
+var _GeneratorUtil = require("solfegejs/lib/utils/GeneratorUtil");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _ref(request, response) {
+    console.log("ok");
+}
+
+class MyBundle {
+    constructor() {
+        this.application;
+        this.container;
     }
 
-    _createClass(MyBundle, [{
-        key: "setApplication",
-        value: function* setApplication(application) {
-            var bindGenerator = _solfegejs2["default"].util.Function.bindGenerator;
-            this.application = application;
-            this.application.on(_solfegejs2["default"].kernel.Application.EVENT_START, bindGenerator(this, this.onApplicationStart));
-        }
-    }, {
-        key: "onApplicationStart",
-        value: function* onApplicationStart() {
-            var server = this.application.getBundle("http");
-            yield server.start();
-        }
-    }]);
+    /**
+     * Get bundle path
+     *
+     * @return  {String}        The bundle path
+     */
+    getPath() {
+        return __dirname;
+    }
 
-    return MyBundle;
-})();
+    /**
+     * Initialize the bundle
+     *
+     * @param   {solfegejs/kernel/Application}  application     Solfege application
+     */
+    *initialize(application) {
+        this.application = application;
 
-exports["default"] = MyBundle;
-module.exports = exports["default"];
+        // Listen the application start
+        this.application.on(_Application2.default.EVENT_START, (0, _GeneratorUtil.bindGenerator)(this, this.onStart));
+    }
+
+    *configureContainer(container) {
+        this.container = container;
+    }
+
+    *onStart() {
+        var serverFactory = yield this.container.get("http_server_factory");
+        var server = serverFactory.create();
+        server.start(8080, _ref);
+    }
+}
+exports.default = MyBundle;
+module.exports = exports['default'];

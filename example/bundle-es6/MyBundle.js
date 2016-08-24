@@ -1,23 +1,51 @@
 import solfege from "solfegejs";
-let Application = solfege.kernel.Application;
+import Application from "solfegejs/lib/kernel/Application";
+import {bindGenerator, isGenerator} from "solfegejs/lib/utils/GeneratorUtil";
 
 export default class MyBundle
 {
     constructor()
     {
+        this.application;
+        this.container;
     }
 
-    *setApplication(application:Application)
+    /**
+     * Get bundle path
+     *
+     * @return  {String}        The bundle path
+     */
+    getPath()
     {
-        let bindGenerator = solfege.util.Function.bindGenerator;
+        return __dirname;
+    }
+
+
+    /**
+     * Initialize the bundle
+     *
+     * @param   {solfegejs/kernel/Application}  application     Solfege application
+     */
+    *initialize(application)
+    {
         this.application = application;
-        this.application.on(solfege.kernel.Application.EVENT_START, bindGenerator(this, this.onApplicationStart));
+
+        // Listen the application start
+        this.application.on(Application.EVENT_START, bindGenerator(this, this.onStart));
     }
 
-    *onApplicationStart()
+    *configureContainer(container)
     {
-        let server = this.application.getBundle("http");
-        yield server.start();
+        this.container = container;
+    }
+
+    *onStart()
+    {
+        let serverFactory = yield this.container.get("http_server_factory");
+        let server = serverFactory.create();
+        server.start(8080, (request, response) => {
+            console.log("ok");
+        });
     }
 }
 
