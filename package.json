@@ -1,7 +1,7 @@
 {
     "name"          : "solfegejs-server",
     "description"   : "Server bundle of SolfegeJS",
-    "version"       : "2.0.0",
+    "version"       : "2.0.1",
     "author"        : "neolao <contact@neolao.com>",
     "repository"    : "https://github.com/neolao/solfege-bundle-server.git",
     "license"       : "MIT",
@@ -36,8 +36,8 @@
     "scripts"       :
     {
         "test"             : "mocha --harmony --harmony-proxies --recursive --reporter spec --bail",
-        "watch"            : "babel --watch --out-dir lib lib-es6",
-        "compile"          : "babel --out-dir lib lib-es6",
+        "watch"            : "babel --watch --out-dir lib lib-es6 --copy-files",
+        "compile"          : "babel --out-dir lib lib-es6 --copy-files",
         "example-compile"  : "babel --out-dir example/bundle example/bundle-es6",
         "example"          : "node --harmony --harmony-proxies example/bundle/console.js"
     },

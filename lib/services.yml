@@ -1,1 +1,15 @@
-../lib-es6/services.yml
+services:
+    # HTTP Server
+    http_server:
+        class: "HttpServer"
+
+    # HTTP Server factory
+    http_server_factory:
+        class: "ServerFactory"
+
+
+    # Default middleware
+    http_server_middleware_default:
+        class: "middlewares/DefaultMiddleware"
+        tags:
+            - { name: "http_server_middleware", priority: 100 }
