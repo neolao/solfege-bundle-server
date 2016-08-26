@@ -56,7 +56,7 @@ export default class HttpServer
      * @param   {uint32}    port        Server port
      * @param   {function}  listener    Server listener
      */
-    start(port:uint32, listener)
+    start(port:uint32, listener = null)
     {
         // Build middlewares defined in services
         let middlewareDecorator = this.buildMiddlewareDecorator(listener);
@@ -80,20 +80,22 @@ export default class HttpServer
      * @param   {function}  lastMiddleware  The last middleware
      * @return  {function}                  The decodator
      */
-    buildMiddlewareDecorator(lastMiddleware)
+    buildMiddlewareDecorator(lastMiddleware = null)
     {
         let self = this;
         let emptyMiddlewareHandler = function*(){};
 
         // Add the last middle
         let middlewares = this.middlewares.slice(0);
-        middlewares.splice(1, 0, {
-            handle: function*(request, response, next) {
-                lastMiddleware(request, response);
+        if (typeof lastMiddleware === "function") {
+            middlewares.splice(1, 0, {
+                handle: function*(request, response, next) {
+                    lastMiddleware(request, response);
 
-                yield *next;
-            }
-        });
+                    yield *next;
+                }
+            });
+        }
 
         // Build the top decorator
         return co.wrap(function*(request, response, next)
