@@ -1,8 +1,9 @@
 import co from "co";
 import http from "http";
+import bindGenerator from "bind-generator";
+import {fn as isGenerator} from "is-generator";
 import Request from "./Request";
 import Response from "./Response";
-import {bindGenerator, isGenerator} from "solfegejs/lib/utils/GeneratorUtil";
 
 /**
  * A simple HTTP server

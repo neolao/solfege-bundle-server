@@ -1,4 +1,3 @@
-import solfege from "solfegejs";
 import MiddlewareCompilerPass from "./DependencyInjection/Compiler/MiddlewareCompilerPass";
 
 /**

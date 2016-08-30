@@ -1,7 +1,7 @@
 {
     "name"          : "solfegejs-server",
     "description"   : "Server bundle of SolfegeJS",
-    "version"       : "2.0.2",
+    "version"       : "2.0.4",
     "author"        : "neolao <contact@neolao.com>",
     "repository"    : "https://github.com/neolao/solfege-bundle-server.git",
     "license"       : "MIT",
@@ -10,9 +10,14 @@
     {
         "node": ">= 5"
     },
+    "peerDependencies"  :
+    {
+        "solfegejs"     : "^2.0"
+    },
     "dependencies"  :
     {
-        "solfegejs"     : "2.x",
+        "bind-generator": "^1.0.0",
+        "is-generator"  : "^1.0.3",
         "co"            : "4.5.*",
         "raw-body"      : "^2.1.*",
         "accepts"       : "1.3.*",
