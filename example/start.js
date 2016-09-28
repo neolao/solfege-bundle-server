@@ -1,6 +1,6 @@
-import solfege from "solfegejs";
-import ServerBundle from "../../lib/Bundle";
-import MyBundle from "./Bundle";
+const solfege = require("solfegejs");
+const ServerBundle = require("../lib/Bundle");
+const MyBundle = require("./lib/Bundle");
 
 let application = solfege.factory();
 application.addBundle(new ServerBundle);

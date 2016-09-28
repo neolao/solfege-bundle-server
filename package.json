@@ -1,7 +1,7 @@
 {
     "name"          : "solfegejs-server",
     "description"   : "Server bundle of SolfegeJS",
-    "version"       : "2.0.4",
+    "version"       : "2.0.6",
     "author"        : "neolao <contact@neolao.com>",
     "repository"    : "https://github.com/neolao/solfege-bundle-server.git",
     "license"       : "MIT",
@@ -12,7 +12,7 @@
     },
     "peerDependencies"  :
     {
-        "solfegejs"     : "^2.0"
+        "solfegejs"     : "2.x"
     },
     "dependencies"  :
     {
@@ -40,12 +40,12 @@
     },
     "scripts"       :
     {
-        "test"             : "mocha --harmony --harmony-proxies --recursive --reporter spec --bail",
+        "test"             : "mocha --harmony --recursive --reporter spec --bail",
         "watch"            : "babel --watch --out-dir lib lib-es6 --copy-files",
         "compile"          : "babel --out-dir lib lib-es6 --copy-files",
-        "example-compile"  : "babel --out-dir example/bundle example/bundle-es6 --copy-files",
-        "example-start"    : "node --harmony --harmony-proxies example/bundle/start.js",
-        "example-console"  : "node --harmony --harmony-proxies example/bundle/console.js"
+        "example-compile"  : "babel --out-dir example/lib example/lib-es6 --copy-files",
+        "example-start"    : "node --harmony example/lib/start.js",
+        "example-console"  : "node --harmony example/lib/console.js"
     },
     "babel": {
         "presets": ["stage-0"],
