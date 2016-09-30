@@ -43,13 +43,27 @@ export default class ServerFactory
     }
 
     /**
-     * Get servers
+     * Get server names
      *
-     * @return  {object}                Servers
+     * @return  {Array}                 Server names
      */
-    getServers()
+    getServerNames()
     {
-        return Object.assign({}, this.servers);
+        let names = [];
+
+        for (let name in this.servers) {
+            if (names.indexOf(name) === -1) {
+                names.push(name);
+            }
+        }
+
+        for (let name in this.middlewares) {
+            if (names.indexOf(name) === -1) {
+                names.push(name);
+            }
+        }
+
+        return names;
     }
 
     /**
