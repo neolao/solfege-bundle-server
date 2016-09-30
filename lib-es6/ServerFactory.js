@@ -43,6 +43,16 @@ export default class ServerFactory
     }
 
     /**
+     * Get servers
+     *
+     * @return  {object}                Servers
+     */
+    getServers()
+    {
+        return Object.assign({}, this.servers);
+    }
+
+    /**
      * Get server by its name
      *
      * @param   {string}        name    Server name
@@ -56,7 +66,7 @@ export default class ServerFactory
     /**
      * Add server middleware
      *
-     * @param   {string}    name        Server name
+     * @param   {string}    serverName  Server name
      * @param   {object}    middleware  Middleware instance
      * @param   {uint32}    priority    Priority
      */
@@ -82,6 +92,21 @@ export default class ServerFactory
             }
             return 0;
         });
+    }
+
+    /**
+     * Get server middlewares
+     *
+     * @param   {string}    serverName      Server name
+     * @return  {Array}                     Middlewares
+     */
+    getMiddlewares(serverName:string)
+    {
+        if (!Array.isArray(this.middlewares[serverName])) {
+            this.middlewares[serverName] = [];
+        }
+
+        return this.middlewares[serverName].slice(0);
     }
 }
 
