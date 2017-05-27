@@ -1,4 +1,6 @@
-import MiddlewareCompilerPass from "./DependencyInjection/Compiler/MiddlewareCompilerPass";
+/* @flow */
+import MiddlewareCompilerPass from "./DependencyInjection/Compiler/MiddlewareCompilerPass"
+import type {ContainerInterface} from "solfegejs-dependency-injection/interface"
 
 /**
  * Server bundle
@@ -8,16 +10,16 @@ export default class Bundle
     /**
      * Constructor
      */
-    constructor()
+    constructor():void
     {
     }
 
     /**
      * Get bundle path
      *
-     * @return  {String}        The bundle path
+     * @return  {string}        The bundle path
      */
-    getPath()
+    getPath():string
     {
         return __dirname;
     }
@@ -27,7 +29,7 @@ export default class Bundle
      *
      * @param   {Container}     container   Service container
      */
-    *configureContainer(container)
+    *configureContainer(container:ContainerInterface):*
     {
         container.addCompilerPass(new MiddlewareCompilerPass());
     }

@@ -1,15 +1,18 @@
+/* @flow */
+import type {ContainerInterface, CompilerPassInterface} from "solfegejs-dependency-injection/interface"
+
 /**
  * Compiler pass for the service container
  * It handles tags to register server middlewares
  */
-export default class MiddlewareCompilerPass
+export default class MiddlewareCompilerPass implements CompilerPassInterface
 {
     /**
      * Process the tags
      *
-     * @param   {Container}     container   Service container
+     * @param   {ContainerInterface}    container   Service container
      */
-    *process(container)
+    *process(container:ContainerInterface):Generator<*,*,*>
     {
         let factoryDefinition = container.getDefinition("http_server_factory");
 
@@ -33,7 +36,7 @@ export default class MiddlewareCompilerPass
                     priority = middlewareTag.priority;
                 }
                 factoryDefinition.addMethodCall("addMiddleware", [
-                    serverName, 
+                    serverName,
                     middlewareReference,
                     priority
                 ]);

@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.default = undefined;
 
 var _ContainerAwareCommand = require("solfegejs/lib/bundles/Console/Command/ContainerAwareCommand");
 
@@ -10,7 +11,7 @@ var _ContainerAwareCommand2 = _interopRequireDefault(_ContainerAwareCommand);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-class StartCommand extends _ContainerAwareCommand2.default {
+var StartCommand = class StartCommand extends _ContainerAwareCommand2.default {
     *configure() {
         this.setName("example:start");
         this.setDescription("Start example");
@@ -27,6 +28,6 @@ class StartCommand extends _ContainerAwareCommand2.default {
 
         console.info("Example started");
     }
-}
+};
 exports.default = StartCommand;
-module.exports = exports['default'];
+module.exports = exports["default"];
