@@ -1,9 +1,11 @@
-import co from "co";
-import http from "http";
-import bindGenerator from "bind-generator";
-import {fn as isGenerator} from "is-generator";
-import Request from "./Request";
-import Response from "./Response";
+/* @flow*/
+import co from "co"
+import http from "http"
+import bindGenerator from "bind-generator"
+import {fn as isGenerator} from "is-generator"
+import Request from "./Request"
+import Response from "./Response"
+import type {RequestInterface, ResponseInterface, MiddlewareInterface} from "../interface"
 
 /**
  * A simple HTTP server
@@ -11,11 +13,21 @@ import Response from "./Response";
 export default class HttpServer
 {
     /**
+     * Server name
+     */
+    name:string;
+
+    /**
+     * Middlewares
+     */
+    middlewares:Array<MiddlewareInterface>;
+
+    /**
      * Constructor
      *
      * @param   {string}    name    Server name
      */
-    constructor(name:string)
+    constructor(name:string):void
     {
         this.name = name;
         this.middlewares = [];
@@ -36,7 +48,7 @@ export default class HttpServer
      *
      * @param   {string}    name    Server name
      */
-    setName(name:string)
+    setName(name:string):void
     {
         this.name = name;
     }
@@ -46,7 +58,7 @@ export default class HttpServer
      *
      * @param   {Array}     middlewares     Middlewares
      */
-    addMiddlewares(middlewares:Array)
+    addMiddlewares(middlewares:Array<MiddlewareInterface>)
     {
         this.middlewares = middlewares;
     }
@@ -57,7 +69,7 @@ export default class HttpServer
      * @param   {uint32}    port        Server port
      * @param   {function}  listener    Server listener
      */
-    start(port:uint32, listener = null)
+    start(port:number, listener?:Function)
     {
         // Build middlewares defined in services
         let middlewareDecorator = this.buildMiddlewareDecorator(listener);
@@ -81,7 +93,7 @@ export default class HttpServer
      * @param   {function}  lastMiddleware  The last middleware
      * @return  {function}                  The decodator
      */
-    buildMiddlewareDecorator(lastMiddleware = null)
+    buildMiddlewareDecorator(lastMiddleware?:Function)
     {
         let self = this;
         let emptyMiddlewareHandler = function*(){};
@@ -91,9 +103,12 @@ export default class HttpServer
         if (typeof lastMiddleware === "function") {
             middlewares.splice(1, 0, {
                 handle: function*(request, response, next) {
+                    // $FlowFixMe
                     lastMiddleware(request, response);
 
-                    yield *next;
+                    if (next) {
+                        yield *next;
+                    }
                 }
             });
         }
@@ -107,10 +122,10 @@ export default class HttpServer
             let previousMiddlewareHandler = next || emptyMiddlewareHandler();
 
             while (index--) {
-                let instance = middlewares[index];
+                let instance:MiddlewareInterface = middlewares[index];
                 let handler = instance.handle;
                 if (!isGenerator(handler)) {
-                    throw new Error("Middleware "+instance+" must have generator method handle()");
+                    throw new Error("Middleware "+String(instance)+" must have generator method handle()");
                 }
 
                 let currentMiddlewareHandler = bindGenerator(instance, handler);
@@ -121,6 +136,3 @@ export default class HttpServer
         });
     }
 }
-
-
-

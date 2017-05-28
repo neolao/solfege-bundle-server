@@ -1,7 +1,10 @@
+/* @flow */
+import type {BundleInterface} from "solfegejs/interface"
+
 /**
  * Example bundle
  */
-export default class Bundle
+export default class Bundle implements BundleInterface
 {
     /**
      * Constructor

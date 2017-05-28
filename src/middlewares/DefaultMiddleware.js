@@ -1,32 +1,37 @@
+/* @flow */
+import type {RequestInterface, ResponseInterface, MiddlewareInterface} from "../../interface"
+
 /**
  * Default middleware
  */
-export default class DefaultMiddleware
+export default class DefaultMiddleware implements MiddlewareInterface
 {
     /**
      * Handle a request
      *
-     * @param   {Request}   request     The request
-     * @param   {Response}  response    The response
-     * @param   {object}    next        The next middleware
+     * @param   {RequestInterface}  request     HTTP request
+     * @param   {ResponseInterface} response    HTTP response
+     * @param   {Function}          next        Next middleware handler
      */
-    *handle(request, response, next)
+    *handle(request:RequestInterface, response:ResponseInterface, next?:Function):Generator<*,*,*>
     {
         // Handle the next middleware
         let error;
         try {
-            yield *next;
+            if (next) {
+                yield *next;
+            }
         } catch (middlewareError) {
             error = middlewareError;
         }
 
         // Variables
-        let body = response.body;
-        let statusCode = response.statusCode;
-        let serverResponse = response.serverResponse;
+        let body = response.getBody();
+        let statusCode = response.getStatusCode();
+        let serverResponse = response.getServerResponse();
 
         // If the headers are sent, then do nothing
-        if (response.headersSent) {
+        if (response.areHeadersSent()) {
             return;
         }
 
@@ -60,7 +65,7 @@ export default class DefaultMiddleware
         // No body
         // Display the status string in the body
         if (null === body || undefined === body) {
-            body = response.statusString;
+            body = response.getStatusString();
         }
 
         // String body
@@ -74,6 +79,7 @@ export default class DefaultMiddleware
         }
 
         // Stream body
+        // $FlowFixMe Flow does not know Stream type
         if (body instanceof Stream) {
             return body.pipe(serverResponse);
         }

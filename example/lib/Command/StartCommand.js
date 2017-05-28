@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = undefined;
 
-var _ContainerAwareCommand = require("solfegejs/lib/bundles/Console/Command/ContainerAwareCommand");
+var _ContainerAwareCommand = require("solfegejs-cli/lib/Command/ContainerAwareCommand");
 
 var _ContainerAwareCommand2 = _interopRequireDefault(_ContainerAwareCommand);
 

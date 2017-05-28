@@ -1,163 +1,234 @@
-import {parse as parseUrl} from "url";
-import {parse as parseQueryString} from "querystring";
-import getRawBody from "raw-body";
-import formidable from "formidable";
-import accepts from "accepts";
+/* @flow */
+import {parse as parseUrl} from "url"
+import {parse as parseQueryString} from "querystring"
+import getRawBody from "raw-body"
+import formidable from "formidable"
+import accepts from "accepts"
+import type {RequestInterface} from "../interface"
+
+// Private properties/methods
+const serverRequest = Symbol();
+const url = Symbol();
+const urlParts = Symbol();
+const query = Symbol();
+const accept = Symbol();
+const parameters = Symbol();
+const fields = Symbol();
+const files = Symbol();
+const rawBody = Symbol();
 
 /**
  * A request
  */
-export default class Request
+export default class Request implements RequestInterface
 {
+    /**
+     * Original request
+     */
+    // $FlowFixMe
+    [serverRequest]:Object;
+
+    /**
+     * Request URL
+     */
+    // $FlowFixMe
+    [url]:string;
+
+    /**
+     * Parts of the URL
+     */
+    // $FlowFixMe
+    [urlParts]:Object;
+
+    /**
+     * Query
+     */
+    // $FlowFixMe
+    [query]:Object;
+
+    /**
+     * Accept informations
+     */
+    // $FlowFixMe
+    [accept]:Object;
+
+    /**
+     * Parameters
+     */
+    // $FlowFixMe
+    [parameters]:Object;
+
     /**
      * Constructor
      *
      * @param   {Object}    serverRequest       The original request
      */
-    constructor(serverRequest)
+    constructor(serverRequest:Object):void
     {
         // Save the original request
-        this.serverRequest = serverRequest;
+        // $FlowFixMe
+        this[serverRequest] = serverRequest;
 
         // Copy some informations
-        this.url = serverRequest.url;
+        // $FlowFixMe
+        this[url] = serverRequest.url;
 
         // Parse the URL
-        this.urlParts = parseUrl(this.url);
-        this._query = null;
+        // $FlowFixMe
+        this[urlParts] = parseUrl(this.url);
+        // $FlowFixMe
+        this[query] = null;
 
         // Initialize the parameters
-        this.parameters = {};
+        // $FlowFixMe
+        this[parameters] = {};
 
         // The fields sent
-        this.fields = null;
+        // $FlowFixMe
+        this[fields] = null;
 
         // The files sent
-        this.files = null;
+        // $FlowFixMe
+        this[files] = null;
 
         // The raw body
-        this.rawBody = null;
+        // $FlowFixMe
+        this[rawBody] = null;
 
         // The helper that parse the headers to get informations like charsets, encodings, etc.
-        this.accept = accepts(serverRequest);
+        // $FlowFixMe
+        this[accept] = accepts(serverRequest);
     }
 
     /**
-     * The method of the request
+     * Get original request
      *
-     * @type {String}
+     * @return  {Object}    Original request
      */
-    get method()
+    getServerRequest():Object
     {
-        return this.serverRequest.method;
+        // $FlowFixMe
+        return this[serverRequest];
     }
 
     /**
-     * The protocol
+     * Method of the request
      *
-     * @type {String}
+     * @return  {String}    HTTP method
      */
-    get protocol()
+    getMethod():string
     {
-        return this.urlParts.protocol;
+        return this.getServerRequest().method;
     }
 
     /**
-     * The host
+     * Protocol of the request
      *
-     * @type {String}
+     * @return  {string}    Protocol
      */
-    get host()
+    getProtocol():string
     {
-        return this.urlParts.host;
+        // $FlowFixMe
+        return this[urlParts].protocol;
     }
 
     /**
-     * The hostname
+     * Host of the request
      *
-     * @type {String}
+     * @return  {string}    Host
      */
-    get hostname()
+    getHost():string
     {
-        return this.urlParts.hostname;
+        // $FlowFixMe
+        return this[urlParts].host;
     }
 
     /**
-     * The port
+     * Hostname of the request
      *
-     * @type {Number}
+     * @return  {string}    Hostname
      */
-    get port()
+    getHostname():string
     {
-        return this.urlParts.port;
+        // $FlowFixMe
+        return this[urlParts].hostname;
     }
 
     /**
-     * The pathname
+     * Get port of the request
      *
-     * @type {String}
+     * @return  {number}    Port
      */
-    get pathname()
+    getPort():number
     {
-        return this.urlParts.pathname;
+        // $FlowFixMe
+        return this[urlParts].port;
     }
 
     /**
-     * The query string including the leading question mark
+     * Get pathname of the request
      *
-     * @type {String}
+     * @return  {string}    Pathname
      */
-    get pathname()
+    getPathname():string
     {
-        return this.urlParts.pathname;
+        // $FlowFixMe
+        return this[urlParts].pathname;
     }
 
     /**
-     * The query string
+     * Get query string of the request
      *
-     * @type {String}
+     * @return  {string}    Query string
      */
-    get queryString()
+    getQueryString():string
     {
-        return this.urlParts.query;
+        // $FlowFixMe
+        return this[urlParts].query;
     }
 
     /**
-     * The query
+     * Get query of the request
      *
-     * @type {Object}
+     * @return  {Object}    Query
      */
-    get query()
+    getQuery():Object
     {
-        if (this._query) {
-            return this._query;
+        // $FlowFixMe
+        if (this[query]) {
+            return this[query];
         }
 
-        this._query = parseQueryString(this.queryString);
+        const queryString:string = this.getQueryString();
+        const queryObject:Object = parseQueryString(queryString);
 
-        return this._query;
+        // $FlowFixMe
+        this[query] = queryObject;
+
+        return queryObject;
     }
 
     /**
-     * The hash
+     * Get hash
      *
-     * @type {String}
+     * @return  {string}    Hash
      */
-    get hash()
+    getHash():string
     {
-        return this.urlParts.hash;
+        // $FlowFixMe
+        return this[urlParts].hash;
     }
 
     /**
      * Get a header
      *
-     * @param   {String}    name    The header name
-     * @return  {String}            The header value
+     * @param   {String}    name    Header name
+     * @return  {String}            Header value
      */
-    getHeader(name)
+    getHeader(name:string):string
     {
         name = name.toLowerCase();
-        return this.serverRequest.headers[name];
+        return this.getServerRequest().headers[name];
     }
 
     /**
@@ -166,9 +237,10 @@ export default class Request
      * @param   {String}    name    The parameter name
      * @return  {any}               The parameter value
      */
-    getParameter(name)
+    getParameter(name:string):any
     {
-        return this.parameters[name];
+        // $FlowFixMe
+        return this[parameters][name];
     }
 
     /**
@@ -177,9 +249,10 @@ export default class Request
      * @param   {String}    name    The parameter name
      * @param   {any}               The parameter value
      */
-    setParameter(name, value)
+    setParameter(name:string, value:any):void
     {
-        this.parameters[name] = value;
+        // $FlowFixMe
+        this[parameters][name] = value;
     }
 
     /**
@@ -188,15 +261,18 @@ export default class Request
      * @param   {Object}    options     The options (see "raw-body" module)
      * @return  {String}                The raw body
      */
-    *getRawBody(options)
+    *getRawBody(options:Object):Generator<*,string,*>
     {
-        if (this.rawBody !== null) {
-            return this.rawBody;
+        // $FlowFixMe
+        if (this[rawBody] !== null) {
+            return this[rawBody];
         }
 
-        let rawBody = yield getRawBody(this.serverRequest, options);
-        this.rawBody = rawBody;
-        return rawBody;
+        const serverRequest:Object = this.getServerRequest();
+        const result:string = yield getRawBody(serverRequest, options);
+        // $FlowFixMe
+        this[rawBody] = result;
+        return result;
     }
 
     /**
@@ -204,11 +280,12 @@ export default class Request
      *
      * @return  {Object}    The fields
      */
-    *getFields()
+    *getFields():Generator<*,Object,*>
     {
         // Get the cached property
-        if (this.fields !== null) {
-            return this.fields;
+        // $FlowFixMe
+        if (this[fields] !== null) {
+            return this[fields];
         }
 
         let data = yield this.getFieldsAndFiles();
@@ -221,11 +298,12 @@ export default class Request
      *
      * @return  {Object}    The files
      */
-    *getFiles()
+    *getFiles():Generator<*,Object,*>
     {
         // Get the cached property
-        if (this.files !== null) {
-            return this.files;
+        // $FlowFixMe
+        if (this[files] !== null) {
+            return this[files];
         }
 
         let data = yield this.getFieldsAndFiles();
@@ -237,31 +315,33 @@ export default class Request
      *
      * @return  {Object}    The object containing the fields and files
      */
-    *getFieldsAndFiles()
+    *getFieldsAndFiles():Generator<*,Object,*>
     {
         // Get the cached properties
-        if (this.fields !== null && this.fields !== null) {
+        // $FlowFixMe
+        if (this[fields] !== null && this[files] !== null) {
             return {
-                fields: this.fields,
-                files: this.files
+                fields: this[fields],
+                files: this[files]
             };
         }
 
         // Extract the properties from the request
-        let self = this;
-        return new Promise(function(resolve, reject) {
+        return new Promise((resolve, reject) => {
             let form = formidable.IncomingForm();
-            form.parse(self.serverRequest, function(error, fields, files) {
+            form.parse(self.serverRequest, (error, parsedFields, parsedFiles) => {
                 if (error) {
                     reject(error);
                     return;
                 }
 
-                self.fields = fields;
-                self.files = files;
+                // $FlowFixMe
+                this[fields] = parsedFields;
+                // $FlowFixMe
+                this[files] = parsedFiles;
                 resolve({
-                    fields: fields,
-                    files: files
+                    fields: parsedFields,
+                    files: parsedFiles
                 });
             });
         });
@@ -274,90 +354,98 @@ export default class Request
      * @param   {array}     charsets    Accepted charsets
      * @return  {string}                First accepted charset
      */
-    acceptsCharsets(...charsets)
+    getFirstAcceptedCharset(...charsets:Array<string>):string
     {
-        return this.accept.charset(charsets);
+        // $FlowFixMe
+        return this[accept].charset(charsets);
     }
 
     /**
-     * Return the charsets that the request accepts, 
+     * Return the charsets that the request accepts,
      * in the order of the client's preference (most preferred first).
      *
-     * @return  {array}     The charsets
+     * @return  {Array}     The charsets
      */
-    charsets()
+    getCharsets():Array<string>
     {
-        return this.accept.charsets();
+        // $FlowFixMe
+        return this[accept].charsets();
     }
 
     /**
-     * Return the first accepted encoding. 
+     * Return the first accepted encoding.
      * If nothing in encodings is accepted, then false is returned.
      *
      * @param   {array}     encodings   Accepted encodings
      * @return  {string}                First accepted encoding
      */
-    acceptsEncodings(...encodings)
+    getFirstAcceptedEncoding(...encodings:Array<string>):string
     {
-        return this.accept.encoding(encodings);
+        // $FlowFixMe
+        return this[accept].encoding(encodings);
     }
 
     /**
-     * Return the encodings that the request accepts, 
+     * Return the encodings that the request accepts,
      * in the order of the client's preference (most preferred first).
      *
-     * @return  {array}     The encodings
+     * @return  {Array}     The encodings
      */
-    encodings()
+    getEncodings():Array<string>
     {
-        return this.accept.encodings();
+        // $FlowFixMe
+        return this[accept].encodings();
     }
 
     /**
-     * Return the first accepted language. 
+     * Return the first accepted language.
      * If nothing in languages is accepted, then false is returned.
      *
      * @param   {array}     languages   Accepted languages
      * @return  {string}                First accepted language
      */
-    acceptsLanguages(...languages)
+    getFirstAcceptedLanguage(...languages:Array<string>):string
     {
-        return this.accept.language(languages);
+        // $FlowFixMe
+        return this[accept].language(languages);
     }
 
     /**
-     * Return the languages that the request accepts, 
+     * Return the languages that the request accepts,
      * in the order of the client's preference (most preferred first).
      *
      * @return  {array}     The languages
      */
-    languages()
+    getLanguages():Array<string>
     {
-        return this.accept.languages();
+        // $FlowFixMe
+        return this[accept].languages();
     }
 
     /**
-     * Return the first accepted type 
-     * (and it is returned as the same text as what appears in the types array). 
+     * Return the first accepted type
+     * (and it is returned as the same text as what appears in the types array).
      * If nothing in types is accepted, then false is returned.
      *
-     * @param   {array}     types   Accepted types
+     * @param   {Array}     types   Accepted types
      * @return  {string}            First accepted type
      */
-    acceptsTypes(...types)
+    getFirstAcceptedType(...types:Array<string>):string
     {
-        return this.accept.type(types);
+        // $FlowFixMe
+        return this[accept].type(types);
     }
 
     /**
-     * Return the types that the request accepts, 
+     * Return the types that the request accepts,
      * in the order of the client's preference (most preferred first).
      *
-     * @return  {array}     The types
+     * @return  {Array}     The types
      */
-    types()
+    getTypes():Array<string>
     {
-        return this.accept.types();
+        // $FlowFixMe
+        return this[accept].types();
     }
 }
 

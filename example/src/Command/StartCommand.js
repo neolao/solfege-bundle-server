@@ -1,14 +1,16 @@
-import ContainerAwareCommand from "solfegejs/lib/bundles/Console/Command/ContainerAwareCommand";
+/* @flow */
+import type {CommandInterface} from "solfegejs-cli/interface"
+import ContainerAwareCommand from "solfegejs-cli/lib/Command/ContainerAwareCommand"
 
 /**
  * Start command
  */
-export default class StartCommand extends ContainerAwareCommand
+export default class StartCommand extends ContainerAwareCommand implements CommandInterface
 {
     /**
      * Configure command
      */
-    *configure()
+    *configure():Generator<*,*,*>
     {
         this.setName("example:start");
         this.setDescription("Start example");
@@ -17,7 +19,7 @@ export default class StartCommand extends ContainerAwareCommand
     /**
      * Execute the command
      */
-    *execute()
+    *execute():Generator<*,*,*>
     {
         let container = this.getContainer();
         let serverFactory = yield container.get("http_server_factory");

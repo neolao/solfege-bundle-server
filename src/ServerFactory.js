@@ -1,4 +1,10 @@
-import HttpServer from "./HttpServer";
+/* @flow */
+import HttpServer from "./HttpServer"
+import type {MiddlewareInterface} from "../interface"
+
+// Private properties/methods
+const servers = Symbol();
+const middlewares = Symbol();
 
 /**
  * Server factory
@@ -6,15 +12,29 @@ import HttpServer from "./HttpServer";
 export default class ServerFactory
 {
     /**
+     * Server instances
+     */
+    // $FlowFixMe
+    [servers]:{[key:string]:HttpServer};
+
+    /**
+     * Middleware by server
+     */
+    // $FlowFixMe
+    [middlewares]:{[key:string]:MiddlewareInterface};
+
+    /**
      * Constructor
      */
-    constructor()
+    constructor():void
     {
         // Server instances
-        this.servers = {};
+        // $FlowFixMe
+        this[servers] = {};
 
         // Middlewares by server
-        this.middlewares = {};
+        // $FlowFixMe
+        this[middlewares] = {};
     }
 
     /**
@@ -25,19 +45,23 @@ export default class ServerFactory
      */
     create(name:string = "default"):HttpServer
     {
+        // $FlowFixMe
+        let middlewaresByServer = this[middlewares];
+
         // Build instance
         // and add middlewares
         let server = new HttpServer(name);
-        let middlewares = [];
-        if (Array.isArray(this.middlewares[name])) {
-            for (let middleware of this.middlewares[name]) {
-                middlewares.push(middleware.instance);
+        let middlewareInstances:Array<MiddlewareInterface> = [];
+        if (middlewaresByServer.hasOwnProperty(name) && Array.isArray(middlewaresByServer[name])) {
+            for (let middleware of middlewaresByServer[name]) {
+                middlewareInstances.push(middleware.instance);
             }
-            server.addMiddlewares(middlewares);
+            server.addMiddlewares(middlewareInstances);
         }
 
-
-        this.servers[name] = server;
+        // $FlowFixMe
+        let serverInstances = this[servers];
+        serverInstances[name] = server;
 
         return server;
     }
@@ -47,17 +71,21 @@ export default class ServerFactory
      *
      * @return  {Array}                 Server names
      */
-    getServerNames()
+    getServerNames():Array<string>
     {
         let names = [];
 
-        for (let name in this.servers) {
+        // $FlowFixMe
+        const serverInstances = this[servers];
+        for (let name in serverInstances) {
             if (names.indexOf(name) === -1) {
                 names.push(name);
             }
         }
 
-        for (let name in this.middlewares) {
+        // $FlowFixMe
+        const middlewaresByServer = this[middlewares];
+        for (let name in middlewaresByServer) {
             if (names.indexOf(name) === -1) {
                 names.push(name);
             }
@@ -74,30 +102,40 @@ export default class ServerFactory
      */
     getServer(name:string = "default"):HttpServer
     {
-        return this.servers[name];
+        // $FlowFixMe
+        const serverInstances = this[servers];
+
+        if (!serverInstances.hasOwnProperty(name)) {
+            throw new Error(`HTTP server not found: ${name}`);
+        }
+
+        return serverInstances[name];
     }
 
     /**
      * Add server middleware
      *
-     * @param   {string}    serverName  Server name
-     * @param   {object}    middleware  Middleware instance
-     * @param   {uint32}    priority    Priority
+     * @param   {string}                serverName  Server name
+     * @param   {MiddlewareInterface}   middleware  Middleware instance
+     * @param   {uint32}                priority    Priority
      */
-    addMiddleware(serverName:string, middleware, priority:uint32)
+    addMiddleware(serverName:string, middleware:MiddlewareInterface, priority:number)
     {
-        if (!Array.isArray(this.middlewares[serverName])) {
-            this.middlewares[serverName] = [];
+        // $FlowFixMe
+        const middlewaresByServer = this[middlewares];
+
+        if (!middlewaresByServer.hasOwnProperty(serverName)) {
+            middlewaresByServer[serverName] = [];
         }
 
         // Add middleware to the list
-        this.middlewares[serverName].push({
+        middlewaresByServer[serverName].push({
             instance: middleware,
             priority: priority
         });
 
         // Sort by priority
-        this.middlewares[serverName].sort((a, b) => {
+        middlewaresByServer[serverName].sort((a, b) => {
             if (a.priority < b.priority) {
                 return -1;
             }
@@ -116,13 +154,15 @@ export default class ServerFactory
      */
     getMiddlewares(serverName:string)
     {
-        if (!Array.isArray(this.middlewares[serverName])) {
-            this.middlewares[serverName] = [];
+        // $FlowFixMe
+        const middlewaresByServer = this[middlewares];
+
+        if (!middlewaresByServer.hasOwnProperty(serverName)) {
+            middlewaresByServer[serverName] = [];
         }
 
-        return this.middlewares[serverName].slice(0);
+        const serverMiddlewares = middlewaresByServer[serverName];
+        return serverMiddlewares.slice(0);
     }
 }
-
-
 

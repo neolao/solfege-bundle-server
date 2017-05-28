@@ -1,27 +1,109 @@
-import http from "http";
+/* @flow */
+import http from "http"
+import type {ResponseInterface} from "../interface"
+
+// Private properties/methods
+const serverResponse = Symbol();
+const body = Symbol();
 
 /**
  * A response
  */
-export default class Response
+export default class Response implements ResponseInterface
 {
+    /**
+     * Original response
+     */
+    // $FlowFixMe
+    [serverResponse]:Object;
+
+    /**
+     * Parameters
+     */
+    parameters:Object;
+
+    /**
+     * Body
+     */
+    // $FlowFixMe
+    [body]:*;
+
     /**
      * Constructor
      *
-     * @param   {Object}    serverResponse      The original response
+     * @param   {Object}    serverResponse      Original response
      */
-    constructor(serverResponse)
+    constructor(serverResponse:Object)
     {
         // Save the original response
-        this.serverResponse = serverResponse;
-
-        // Copy some functions and informations
-        this.getHeader = serverResponse.getHeader.bind(serverResponse);
-        this.setHeader = serverResponse.setHeader.bind(serverResponse);
-        this.removeHeader = serverResponse.removeHeader.bind(serverResponse);
+        // $FlowFixMe
+        this[serverResponse] = serverResponse;
 
         // Set default values
         this.parameters = {};
+    }
+
+    /**
+     * Get original response
+     *
+     * @return  {*}     Original response
+     */
+    getServerResponse():*
+    {
+        // $FlowFixMe
+        return this[serverResponse];
+    }
+
+    /**
+     * Set header
+     *
+     * @param   {string}    name    Header name
+     * @param   {string}    value   Header value
+     */
+    setHeader(name:string, value:string):void
+    {
+        this.getServerResponse().setHeader(name, value);
+    }
+
+    /**
+     * Get header
+     *
+     * @param   {string}    name    Header name
+     * @return  {string}            Header value
+     */
+    getHeader(name:string):string
+    {
+        return this.getServerResponse().getHeader(name);
+    }
+
+    /**
+     * Remove header
+     *
+     * @param   {string}    name    Header name
+     */
+    removeHeader(name:string):void
+    {
+        this.getServerResponse().removeHeader(name);
+    }
+
+    /**
+     * Get status code
+     *
+     * @return  {number}    Status code
+     */
+    getStatusCode():number
+    {
+        return this.getServerResponse().statusCode;
+    }
+
+    /**
+     * Set status code
+     *
+     * @param   {number}    value   Status code
+     */
+    setStatusCode(value:number):void
+    {
+        this.getServerResponse().statusCode = value;
     }
 
     /**
@@ -30,14 +112,26 @@ export default class Response
      * @type {Number}
      * @api public
      */
-    get statusCode()
+    get statusCode():number
     {
-        return this.serverResponse.statusCode;
+        return this.getStatusCode();
     }
-    set statusCode(value)
+    set statusCode(value:number):void
     {
-        this.serverResponse.statusCode = value;
+        this.setStatusCode(value);
     }
+
+    /**
+     * Get status string
+     *
+     * @return  {string}    Status string
+     */
+    getStatusString():string
+    {
+        const statusCode = this.getStatusCode();
+        return http.STATUS_CODES[statusCode];
+    }
+
 
     /**
      * The status string
@@ -45,9 +139,19 @@ export default class Response
      * @type {String}
      * @api public
      */
-    get statusString()
+    get statusString():string
     {
-        return http.STATUS_CODES[this.statusCode];
+        return this.getStatusString();
+    }
+
+    /**
+     * Indicates that the headers are sent
+     *
+     * @return  {boolean}   true if the headers are sent, false otherwise
+     */
+    areHeadersSent():boolean
+    {
+        return this.getServerResponse().headersSent;
     }
 
     /**
@@ -56,24 +160,20 @@ export default class Response
      * @type {Boolean}
      * @api public
      */
-    get headerSent()
+    get headerisSent():boolean
     {
-        return this.serverResponse.headersSent;
+        return this.areHeadersSent();
     }
 
     /**
-     * The response body
+     * Set response body
      *
-     * @type {any}
-     * @api public
+     * @param   {*}     value   Body value
      */
-    get body()
+    setBody(value:*):void
     {
-        return this._body;
-    }
-    set body(value)
-    {
-        this._body = value;
+        // $FlowFixMe
+        this[body] = value;
 
         // No content
         if (null === value) {
@@ -82,24 +182,67 @@ export default class Response
             this.removeHeader('Transfer-Encoding');
             return;
         }
+    }
 
+    /**
+     * Get response body
+     *
+     * @return  {*}     Body value
+     */
+    getBody():*
+    {
+        // $FlowFixMe
+        return this[body];
+    }
+
+
+    /**
+     * The response body
+     *
+     * @type {any}
+     * @api public
+     */
+    get body():*
+    {
+        return this.getBody();
+    }
+    set body(value:*):void
+    {
+        this.setBody(value);
+    }
+
+    /**
+     * Get body length
+     *
+     * @return  {number}    Body length
+     */
+    getLength():number
+    {
+        let serverResponse = this.getServerResponse();
+        let length = serverResponse._headers["content-length"];
+        return ~~length;
+    }
+
+    /**
+     * Set body length
+     *
+     * @param   {number}    value   Body length
+     */
+    setLength(value:number):void
+    {
+        this.setHeader("Content-Length", String(value));
     }
 
     /**
      * The body length
-     *
-     * @type {Number}
-     * @api public
      */
-    get length()
+    get length():number
     {
-        var length = this.serverResponse._headers['content-length'];
-
-        return ~~length;
+        return this.getLength();
     }
-    set length(value)
+    set length(value:number)
     {
-        this.setHeader('Content-Length', value);
+        this.setLength(value);
     }
 }
 
