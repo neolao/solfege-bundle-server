@@ -84,7 +84,6 @@ export default class HttpServer
         });
 
         server.listen(port);
-        console.log(`Server started on port ${port}`);
     }
 
     /**

@@ -75,7 +75,7 @@ export default class Request implements RequestInterface
 
         // Parse the URL
         // $FlowFixMe
-        this[urlParts] = parseUrl(this.url);
+        this[urlParts] = parseUrl(serverRequest.url);
         // $FlowFixMe
         this[query] = null;
 
