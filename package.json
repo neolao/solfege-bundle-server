@@ -1,7 +1,7 @@
 {
     "name": "solfegejs-server",
     "description": "Server bundle of SolfegeJS",
-    "version": "2.1.4",
+    "version": "2.1.5",
     "author": "neolao <contact@neolao.com>",
     "repository": "https://github.com/neolao/solfege-bundle-server.git",
     "license": "MIT",
@@ -37,7 +37,7 @@
         "flow-start": "flow start",
         "flow-restart": "flow stop; flow start",
         "prepare": "npm run build",
-        "prebuild": "flow",
+        "prebuild": "flow stop; flow start",
         "build": "babel --out-dir lib src --copy-files",
         "watch": "watch 'echo \"----------\"; npm run build --silent | gnomon' ./src",
         "example-build": "flow; babel --out-dir example/lib example/src --copy-files",

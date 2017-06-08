@@ -158,6 +158,22 @@ export interface RequestInterface
      * @return  {Array}     The types
      */
     getTypes():Array<string>;
+
+    /**
+     * Get a parameter value
+     *
+     * @param   {String}    name    The parameter name
+     * @return  {any}               The parameter value
+     */
+    getParameter(name:string):any;
+
+    /**
+     * Set a parameter value
+     *
+     * @param   {String}    name    The parameter name
+     * @param   {any}               The parameter value
+     */
+    setParameter(name:string, value:any):void;
 }
 
 /**
