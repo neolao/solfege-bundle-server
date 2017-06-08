@@ -6,6 +6,13 @@
 export interface RequestInterface
 {
     /**
+     * Get URL
+     *
+     * @return  {string}    URL
+     */
+    getUrl():string;
+
+    /**
      * Get original request
      *
      * @return  {Object}    Original request

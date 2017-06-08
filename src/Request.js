@@ -101,6 +101,17 @@ export default class Request implements RequestInterface
     }
 
     /**
+     * Get URL
+     *
+     * @return  {string}    URL
+     */
+    getUrl():string
+    {
+        // $FlowFixMe
+        return this[url];
+    }
+
+    /**
      * Get original request
      *
      * @return  {Object}    Original request
