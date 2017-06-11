@@ -31,13 +31,13 @@ export default class Response implements ResponseInterface
     /**
      * Constructor
      *
-     * @param   {Object}    serverResponse      Original response
+     * @param   {Object}    nodeResponse    Original response
      */
-    constructor(serverResponse:Object)
+    constructor(nodeResponse:Object)
     {
         // Save the original response
         // $FlowFixMe
-        this[serverResponse] = serverResponse;
+        this[serverResponse] = nodeResponse;
 
         // Set default values
         this.parameters = {};
@@ -177,9 +177,9 @@ export default class Response implements ResponseInterface
 
         // No content
         if (null === value) {
-            this.removeHeader('Content-Type');
-            this.removeHeader('Content-Length');
-            this.removeHeader('Transfer-Encoding');
+            this.removeHeader("Content-Type");
+            this.removeHeader("Content-Length");
+            this.removeHeader("Transfer-Encoding");
             return;
         }
     }

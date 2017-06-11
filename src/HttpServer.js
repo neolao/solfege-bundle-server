@@ -72,13 +72,13 @@ export default class HttpServer
     start(port:number, listener?:Function)
     {
         // Build middlewares defined in services
-        let middlewareDecorator = this.buildMiddlewareDecorator(listener);
+        const middlewareDecorator = this.buildMiddlewareDecorator(listener);
 
         // Create the server
         const server = http.createServer((request, response) =>
         {
-            let customRequest = new Request(request);
-            let customResponse = new Response(response);
+            const customRequest:RequestInterface = new Request(request);
+            const customResponse:ResponseInterface = new Response(response);
 
             middlewareDecorator(customRequest, customResponse);
         });
@@ -94,7 +94,6 @@ export default class HttpServer
      */
     buildMiddlewareDecorator(lastMiddleware?:Function)
     {
-        let self = this;
         let emptyMiddlewareHandler = function*(){};
 
         // Add the last middle

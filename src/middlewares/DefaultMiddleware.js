@@ -1,5 +1,6 @@
 /* @flow */
 import type {RequestInterface, ResponseInterface, MiddlewareInterface} from "../../interface"
+import stream from "stream"
 
 /**
  * Default middleware
@@ -79,8 +80,7 @@ export default class DefaultMiddleware implements MiddlewareInterface
         }
 
         // Stream body
-        // $FlowFixMe Flow does not know Stream type
-        if (body instanceof Stream) {
+        if (body instanceof stream.Writable) {
             return body.pipe(serverResponse);
         }
 

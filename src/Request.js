@@ -337,10 +337,12 @@ export default class Request implements RequestInterface
             };
         }
 
+        const originalRequest = this.getServerRequest();
+
         // Extract the properties from the request
         return new Promise((resolve, reject) => {
             let form = formidable.IncomingForm();
-            form.parse(self.serverRequest, (error, parsedFields, parsedFiles) => {
+            form.parse(originalRequest, (error, parsedFields, parsedFiles) => {
                 if (error) {
                     reject(error);
                     return;
