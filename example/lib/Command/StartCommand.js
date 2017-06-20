@@ -21,10 +21,10 @@ var StartCommand = class StartCommand extends _ContainerAwareCommand2.default {
         var container = this.getContainer();
         var serverFactory = yield container.get("http_server_factory");
 
-        var defaultServer = serverFactory.create();
-        var secondaryServer = serverFactory.create("secondary");
-        defaultServer.start(8080);
-        secondaryServer.start(8081);
+        var defaultServer = serverFactory.create("default", 8083);
+        var secondaryServer = serverFactory.create("secondary", 8081);
+        defaultServer.start();
+        secondaryServer.start();
 
         console.info("Example started");
     }

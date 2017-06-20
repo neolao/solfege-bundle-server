@@ -1,7 +1,7 @@
 {
     "name": "solfegejs-server",
     "description": "Server bundle of SolfegeJS",
-    "version": "2.1.6",
+    "version": "2.2.0",
     "author": "neolao <contact@neolao.com>",
     "repository": "https://github.com/neolao/solfege-bundle-server.git",
     "license": "MIT",
@@ -37,7 +37,7 @@
     "scripts": {
         "flow-stop": "flow stop",
         "flow-start": "flow start",
-        "flow-restart": "flow stop; flow start",
+        "flow-restart": "flow stop && flow start",
         "lint": "eslint --ext .js src",
         "prepare": "npm run build",
         "prebuild": "npm run lint && npm run flow-restart && flow",

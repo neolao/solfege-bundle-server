@@ -25,9 +25,9 @@ export default class StartCommand extends ContainerAwareCommand implements Comma
         let serverFactory = yield container.get("http_server_factory");
 
         let defaultServer = serverFactory.create();
-        let secondaryServer = serverFactory.create("secondary");
-        defaultServer.start(8080);
-        secondaryServer.start(8081);
+        let secondaryServer = serverFactory.create("secondary", 8081);
+        defaultServer.start();
+        secondaryServer.start();
 
         console.info("Example started");
     }

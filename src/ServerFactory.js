@@ -40,17 +40,19 @@ export default class ServerFactory
     /**
      * Create a server
      *
-     * @param   {string}        name    Server name
-     * @return  {HttpServer}            Server instance
+     * @param   {string}        name        Server name
+     * @param   {number}        port        Server port
+     * @param   {Function}      listener    Listener
+     * @return  {HttpServer}                Server instance
      */
-    create(name:string = "default"):HttpServer
+    create(name:string = "default", port:number = 8080, listener?:Function):HttpServer
     {
         // $FlowFixMe
         let middlewaresByServer = this[middlewares];
 
         // Build instance
         // and add middlewares
-        let server = new HttpServer(name);
+        let server = new HttpServer(name, port, listener);
         let middlewareInstances:Array<MiddlewareInterface> = [];
         if (middlewaresByServer.hasOwnProperty(name) && Array.isArray(middlewaresByServer[name])) {
             for (let middleware of middlewaresByServer[name]) {

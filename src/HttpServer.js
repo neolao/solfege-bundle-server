@@ -18,6 +18,16 @@ export default class HttpServer
     name:string;
 
     /**
+     * Port number
+     */
+    port:number;
+
+    /**
+     * Listener
+     */
+    listener:Function;
+
+    /**
      * Middlewares
      */
     middlewares:Array<MiddlewareInterface>;
@@ -25,11 +35,17 @@ export default class HttpServer
     /**
      * Constructor
      *
-     * @param   {string}    name    Server name
+     * @param   {string}    name        Server name
+     * @param   {number}    port        Server port
+     * @param   {Function}  listener    Listener
      */
-    constructor(name:string):void
+    constructor(name:string, port:number = 8080, listener?:Function):void
     {
         this.name = name;
+        this.port = port;
+        if (typeof listener === "function") {
+            this.listener = listener;
+        }
         this.middlewares = [];
     }
 
@@ -54,6 +70,46 @@ export default class HttpServer
     }
 
     /**
+     * Get server port
+     *
+     * @return  {number}    Server port
+     */
+    getPort():number
+    {
+        return this.port;
+    }
+
+    /**
+     * Set server port
+     *
+     * @param   {number}    port    Server port
+     */
+    setPort(port:number):void
+    {
+        this.port = port;
+    }
+
+    /**
+     * Get server listener
+     *
+     * @return  {Function}  Listener
+     */
+    getListener():Function
+    {
+        return this.listener;
+    }
+
+    /**
+     * Set server listener
+     *
+     * @param   {Function}  listener    Listener
+     */
+    setListener(listener:Function):void
+    {
+        this.listener = listener;
+    }
+
+    /**
      * Add middlewares
      *
      * @param   {Array}     middlewares     Middlewares
@@ -65,14 +121,11 @@ export default class HttpServer
 
     /**
      * Start the server
-     *
-     * @param   {uint32}    port        Server port
-     * @param   {function}  listener    Server listener
      */
-    start(port:number, listener?:Function)
+    start()
     {
         // Build middlewares defined in services
-        const middlewareDecorator = this.buildMiddlewareDecorator(listener);
+        const middlewareDecorator = this.buildMiddlewareDecorator(this.listener);
 
         // Create the server
         const server = http.createServer((request, response) =>
@@ -83,7 +136,7 @@ export default class HttpServer
             middlewareDecorator(customRequest, customResponse);
         });
 
-        server.listen(port);
+        server.listen(this.port);
     }
 
     /**
