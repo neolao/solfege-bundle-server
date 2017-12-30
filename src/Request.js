@@ -272,7 +272,7 @@ export default class Request implements RequestInterface
      * @param   {Object}    options     The options (see "raw-body" module)
      * @return  {String}                The raw body
      */
-    *getRawBody(options:Object):Generator<*,string,*>
+    async getRawBody(options:Object):Promise<string>
     {
         // $FlowFixMe
         if (this[rawBody] !== null) {
@@ -280,7 +280,7 @@ export default class Request implements RequestInterface
         }
 
         const serverRequest:Object = this.getServerRequest();
-        const result:string = yield getRawBody(serverRequest, options);
+        const result:string = await getRawBody(serverRequest, options);
         // $FlowFixMe
         this[rawBody] = result;
         return result;
@@ -291,7 +291,7 @@ export default class Request implements RequestInterface
      *
      * @return  {Object}    The fields
      */
-    *getFields():Generator<*,Object,*>
+    async getFields():Promise<Object>
     {
         // Get the cached property
         // $FlowFixMe
@@ -299,7 +299,7 @@ export default class Request implements RequestInterface
             return this[fields];
         }
 
-        let data = yield this.getFieldsAndFiles();
+        let data = await this.getFieldsAndFiles();
         return data.fields;
     }
 
@@ -309,7 +309,7 @@ export default class Request implements RequestInterface
      *
      * @return  {Object}    The files
      */
-    *getFiles():Generator<*,Object,*>
+    async getFiles():Promise<Object>
     {
         // Get the cached property
         // $FlowFixMe
@@ -317,7 +317,7 @@ export default class Request implements RequestInterface
             return this[files];
         }
 
-        let data = yield this.getFieldsAndFiles();
+        let data = await this.getFieldsAndFiles();
         return data.files;
     }
 
@@ -326,7 +326,7 @@ export default class Request implements RequestInterface
      *
      * @return  {Object}    The object containing the fields and files
      */
-    *getFieldsAndFiles():Generator<*,Object,*>
+    async getFieldsAndFiles():Promise<Object>
     {
         // Get the cached properties
         // $FlowFixMe

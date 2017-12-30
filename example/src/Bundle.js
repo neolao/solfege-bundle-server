@@ -1,5 +1,5 @@
 /* @flow */
-import type {BundleInterface} from "solfegejs/interface"
+import type {BundleInterface} from "solfegejs-application/src/BundleInterface"
 
 /**
  * Example bundle

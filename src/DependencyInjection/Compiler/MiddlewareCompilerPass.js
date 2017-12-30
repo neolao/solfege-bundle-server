@@ -12,7 +12,7 @@ export default class MiddlewareCompilerPass implements CompilerPassInterface
      *
      * @param   {ContainerInterface}    container   Service container
      */
-    *process(container:ContainerInterface):Generator<*,*,*>
+    process(container:ContainerInterface)
     {
         let factoryDefinition = container.getDefinition("http_server_factory");
 

@@ -280,5 +280,5 @@ export interface MiddlewareInterface
      * @param   {ResponseInterface} response    HTTP response
      * @param   {Function}          next        Next middleware handler
      */
-    handle(request:RequestInterface, response:ResponseInterface, next?:Function):Generator<*,*,*>
+    handle(request:RequestInterface, response:ResponseInterface, next:Function):void | Promise<void>
 }

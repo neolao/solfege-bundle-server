@@ -1,16 +1,32 @@
 /* @flow */
 import type {CommandInterface} from "solfegejs-cli/interface"
-import ContainerAwareCommand from "solfegejs-cli/lib/Command/ContainerAwareCommand"
+import AbstractCommand from "solfegejs-cli/lib/Command/AbstractCommand"
+import type ServerFactory from "../../../src/ServerFactory"
 
 /**
  * Start command
  */
-export default class StartCommand extends ContainerAwareCommand implements CommandInterface
+export default class StartCommand extends AbstractCommand implements CommandInterface
 {
+    /**
+     * Server factory
+     */
+    serverFactory:ServerFactory;
+
+    /**
+     * Constructor
+     */
+    constructor(serverFactory:ServerFactory)
+    {
+        super();
+
+        this.serverFactory = serverFactory;
+    }
+
     /**
      * Configure command
      */
-    *configure():Generator<*,*,*>
+    async configure()
     {
         this.setName("example:start");
         this.setDescription("Start example");
@@ -19,15 +35,12 @@ export default class StartCommand extends ContainerAwareCommand implements Comma
     /**
      * Execute the command
      */
-    *execute():Generator<*,*,*>
+    async execute()
     {
-        let container = this.getContainer();
-        let serverFactory = yield container.get("http_server_factory");
-
-        let defaultServer = serverFactory.create();
-        let secondaryServer = serverFactory.create("secondary", 8081);
+        let defaultServer = this.serverFactory.create("default", 8080, () => {
+            console.log("hit");
+        });
         defaultServer.start();
-        secondaryServer.start();
 
         console.info("Example started");
     }

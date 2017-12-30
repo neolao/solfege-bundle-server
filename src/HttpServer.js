@@ -1,11 +1,10 @@
 /* @flow*/
-import co from "co"
 import http from "http"
-import bindGenerator from "bind-generator"
-import {fn as isGenerator} from "is-generator"
 import Request from "./Request"
 import Response from "./Response"
-import type {RequestInterface, ResponseInterface, MiddlewareInterface} from "../interface"
+import type {MiddlewareInterface} from "../interface"
+import {bind} from "decko"
+import isAsync from "is-es7-async"
 
 /**
  * A simple HTTP server
@@ -124,16 +123,15 @@ export default class HttpServer
      */
     start()
     {
-        // Build middlewares defined in services
-        const middlewareDecorator = this.buildMiddlewareDecorator(this.listener);
-
         // Create the server
         const server = http.createServer((request, response) =>
         {
-            const customRequest:RequestInterface = new Request(request);
-            const customResponse:ResponseInterface = new Response(response);
+            const customRequest:Request = new Request(request);
+            const customResponse:Response = new Response(response);
 
-            middlewareDecorator(customRequest, customResponse);
+            // Build middlewares defined in services
+            const middlewareDecorator = this.buildMiddlewareDecorator(customRequest, customResponse, this.listener);
+            middlewareDecorator();
         });
 
         server.listen(this.port);
@@ -143,47 +141,69 @@ export default class HttpServer
      * Build middleware decorator
      *
      * @param   {function}  lastMiddleware  The last middleware
-     * @return  {function}                  The decodator
+     * @param   {Request}   request         Request
+     * @param   {Response}  response        Response
+     * @return  {function}                  The decorator
      */
-    buildMiddlewareDecorator(lastMiddleware?:Function)
+    buildMiddlewareDecorator(request:Request, response:Response, lastMiddleware:Function):Function
     {
-        let emptyMiddlewareHandler = function*(){};
-
         // Add the last middle
         let middlewares = this.middlewares.slice(0);
         if (typeof lastMiddleware === "function") {
             middlewares.splice(1, 0, {
-                handle: function*(request, response, next) {
-                    // $FlowFixMe
-                    lastMiddleware(request, response);
-
-                    if (next) {
-                        yield *next;
+                handle: async function(request, response, next) {
+                    if (isAsync(lastMiddleware)) {
+                        await lastMiddleware(request, response);
+                    } else {
+                        lastMiddleware(request, response);
                     }
+
+                    await next();
                 }
             });
         }
 
+        // Start to the end of the list
+        // The previous middleware is the argument of the current one, etc.
+        let index = middlewares.length;
+        let previousMiddlewareHandler = async () => {};
+        let currentMiddlewareHandler = async () => {};
+
+        while (index--) {
+            currentMiddlewareHandler = this.decorateMiddleware(
+                middlewares[index],
+                previousMiddlewareHandler,
+                request,
+                response
+            );
+            previousMiddlewareHandler = currentMiddlewareHandler;
+        }
+
+
         // Build the top decorator
-        return co.wrap(function*(request, response, next)
+        return async function()
         {
-            // Start to the end of the list
-            // The previous middleware is the argument of the current one, etc.
-            let index = middlewares.length;
-            let previousMiddlewareHandler = next || emptyMiddlewareHandler();
+            await currentMiddlewareHandler();
+        }
+    }
 
-            while (index--) {
-                let instance:MiddlewareInterface = middlewares[index];
-                let handler = instance.handle;
-                if (!isGenerator(handler)) {
-                    throw new Error("Middleware "+String(instance)+" must have generator method handle()");
-                }
+    /**
+     * Decorate middleware
+     */
+    @bind
+    decorateMiddleware(middleware:any, previousHandler:Function, request:Request, response:Response)
+    {
+        if (typeof middleware.handle !== "function") {
+            throw new Error("Middleware "+String(middleware)+" must have method handle()");
+        }
 
-                let currentMiddlewareHandler = bindGenerator(instance, handler);
-                previousMiddlewareHandler = currentMiddlewareHandler(request, response, previousMiddlewareHandler);
+        let currentHandler = async () => {
+            if (isAsync(middleware.handle)) {
+                await middleware.handle(request, response, previousHandler);
+            } else {
+                middleware.handle(request, response, previousHandler);
             }
-
-            yield *previousMiddlewareHandler;
-        });
+        };
+        return currentHandler;
     }
 }

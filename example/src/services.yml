@@ -1,12 +1,14 @@
 services:
     example_start:
         class: "Command/StartCommand"
+        arguments:
+            - "@http_server_factory"
         tags:
             - { name: "solfege.console.command" }
 
 
     # Default middleware for secondary server
-    secondary_server_middleware_default:
-        class: "@http_server_middleware_default"
-        tags:
-            - { name: "http_server_middleware", server_name: "secondary", priority: 100 }
+    #secondary_server_middleware_default:
+    #    class: "@http_server_middleware_default"
+    #    tags:
+    #        - { name: "http_server_middleware", server_name: "secondary", priority: 100 }

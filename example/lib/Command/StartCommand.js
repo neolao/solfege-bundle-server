@@ -1,33 +1,37 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
 exports.default = undefined;
 
-var _ContainerAwareCommand = require("solfegejs-cli/lib/Command/ContainerAwareCommand");
+var _AbstractCommand = require("solfegejs-cli/lib/Command/AbstractCommand");
 
-var _ContainerAwareCommand2 = _interopRequireDefault(_ContainerAwareCommand);
+var _AbstractCommand2 = _interopRequireDefault(_AbstractCommand);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var StartCommand = class StartCommand extends _ContainerAwareCommand2.default {
-    *configure() {
-        this.setName("example:start");
-        this.setDescription("Start example");
-    }
+function _ref() {
+  console.log("hit");
+}
 
-    *execute() {
-        var container = this.getContainer();
-        var serverFactory = yield container.get("http_server_factory");
+var StartCommand = class StartCommand extends _AbstractCommand2.default {
+  constructor(serverFactory) {
+    super();
 
-        var defaultServer = serverFactory.create("default", 8083);
-        var secondaryServer = serverFactory.create("secondary", 8081);
-        defaultServer.start();
-        secondaryServer.start();
+    this.serverFactory = serverFactory;
+  }
 
-        console.info("Example started");
-    }
+  async configure() {
+    this.setName("example:start");
+    this.setDescription("Start example");
+  }
+
+  async execute() {
+    var defaultServer = this.serverFactory.create("default", 8080, _ref);
+    defaultServer.start();
+
+    console.info("Example started");
+  }
 };
 exports.default = StartCommand;
-module.exports = exports["default"];

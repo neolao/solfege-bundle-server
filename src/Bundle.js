@@ -1,6 +1,6 @@
 /* @flow */
 import MiddlewareCompilerPass from "./DependencyInjection/Compiler/MiddlewareCompilerPass"
-import type {BundleInterface} from "solfegejs/interface"
+import type {BundleInterface} from "solfegejs-application/src/BundleInterface"
 import type {ContainerInterface} from "solfegejs-dependency-injection/interface"
 
 /**
@@ -30,7 +30,7 @@ export default class Bundle implements BundleInterface
      *
      * @param   {Container}     container   Service container
      */
-    *configureContainer(container:ContainerInterface):*
+    configureContainer(container:ContainerInterface)
     {
         container.addCompilerPass(new MiddlewareCompilerPass());
     }

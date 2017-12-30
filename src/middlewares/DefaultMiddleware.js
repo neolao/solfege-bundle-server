@@ -1,6 +1,7 @@
 /* @flow */
 import type {RequestInterface, ResponseInterface, MiddlewareInterface} from "../../interface"
-import stream from "stream"
+import Stream from "stream"
+import isAsync from "is-es7-async"
 
 /**
  * Default middleware
@@ -14,13 +15,15 @@ export default class DefaultMiddleware implements MiddlewareInterface
      * @param   {ResponseInterface} response    HTTP response
      * @param   {Function}          next        Next middleware handler
      */
-    *handle(request:RequestInterface, response:ResponseInterface, next?:Function):Generator<*,*,*>
+    async handle(request:RequestInterface, response:ResponseInterface, next:Function):void | Promise<void>
     {
         // Handle the next middleware
         let error;
         try {
-            if (next) {
-                yield *next;
+            if (isAsync(next)) {
+                await next(request, response);
+            } else {
+                next(request, response);
             }
         } catch (middlewareError) {
             error = middlewareError;
@@ -80,7 +83,7 @@ export default class DefaultMiddleware implements MiddlewareInterface
         }
 
         // Stream body
-        if (body instanceof stream.Writable) {
+        if (body instanceof Stream) {
             return body.pipe(serverResponse);
         }
 
